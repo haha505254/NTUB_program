@@ -68,7 +68,13 @@ class DoctorSchedule(models.Model):
         return self.appointments.exclude(status=Appointment.Status.CANCELLED).count()
 
     def next_queue_number(self) -> int:
-        return self.appointments.count() + 1
+        existing = self.appointments.aggregate(max_number=models.Max("queue_number"))
+        max_number = existing.get("max_number") or 0
+        return max_number + 1
+
+    @property
+    def remaining_quota(self) -> int:
+        return max(self.quota - self.capacity_used, 0)
 
 
 class Appointment(models.Model):

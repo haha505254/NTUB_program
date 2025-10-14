@@ -7,23 +7,41 @@
 <table>
   <thead>
     <tr>
-      <th>日期</th>
-      <th>診間</th>
+      <th>日期 / 時段</th>
+      <th>醫師 / 科別</th>
+      <th>就診對象</th>
       <th>號碼</th>
       <th>狀態</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     {% for appointment in appointments %}
       <tr>
         <td>{{ appointment.schedule.date }} {{ appointment.schedule.get_session_display }}</td>
-        <td>{{ appointment.schedule.clinic_room|default:"-" }}</td>
+        <td>{{ appointment.schedule.doctor.user.display_name }}（{{ appointment.schedule.doctor.department.name }}）</td>
+        <td>
+          {% if appointment.family_member %}
+            {{ appointment.family_member.full_name }}
+          {% else %}
+            本人
+          {% endif %}
+        </td>
         <td>{{ appointment.queue_number }}</td>
         <td>{{ appointment.get_status_display }}</td>
+        <td>
+          <a href="{% url 'patients:appointment-progress' appointment.pk %}" role="button">看診進度</a>
+          {% if appointment.status == 'reserved' %}
+            <form method="post" action="{% url 'patients:appointment-cancel' appointment.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="secondary">取消</button>
+            </form>
+          {% endif %}
+        </td>
       </tr>
     {% empty %}
       <tr>
-        <td colspan="4">目前沒有掛號紀錄。</td>
+        <td colspan="6">目前沒有掛號紀錄。</td>
       </tr>
     {% endfor %}
   </tbody>

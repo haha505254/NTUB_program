@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.conf import settings
 from django.db import models
+from django.utils.crypto import get_random_string
 
 
 class Patient(models.Model):
@@ -28,6 +29,15 @@ class Patient(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.display_name} ({self.medical_record_number})"
+
+    @classmethod
+    def generate_medical_record_number(cls) -> str:
+        """產生唯一的病歷號。"""
+
+        while True:
+            candidate = f"MRN{get_random_string(6, allowed_chars='0123456789')}"
+            if not cls.objects.filter(medical_record_number=candidate).exists():
+                return candidate
 
 
 class FamilyMember(models.Model):

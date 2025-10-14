@@ -5,12 +5,23 @@
 {% block content %}
 <section>
   <h1>個人資料</h1>
+  <p>
+    <a href="{% url 'accounts:profile-edit' %}" role="button">編輯個人資料</a>
+    <a href="{% url 'accounts:password-change' %}" role="button" class="secondary">變更密碼</a>
+  </p>
   <ul>
     <li>帳號：{{ request.user.username }}</li>
     <li>姓名：{{ request.user.get_full_name }}</li>
     <li>角色：{{ request.user.get_role_display|default:"-" }}</li>
     <li>電子郵件：{{ request.user.email }}</li>
     <li>電話：{{ request.user.phone_number }}</li>
+    {% if patient %}
+      <li>身分證號：{{ patient.national_id }}</li>
+      <li>病歷號：{{ patient.medical_record_number }}</li>
+      <li>生日：{{ patient.birth_date }}</li>
+      <li>地址：{{ patient.address|default:"-" }}</li>
+      <li>緊急聯絡人：{{ patient.emergency_contact|default:"-" }}</li>
+    {% endif %}
   </ul>
 </section>
 {% endblock %}

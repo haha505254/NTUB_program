@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}註冊帳號{% endblock %}
+
+{% block content %}
+<h1>註冊病患帳號</h1>
+<p>請填寫個人資料以建立可線上掛號的帳號，登入時將使用身分證號與密碼。</p>
+<form method="post">
+  {% csrf_token %}
+  <div class="grid">
+    <label>
+      {{ form.username.label_tag }}
+      {{ form.username }}
+      {% if form.username.help_text %}<small>{{ form.username.help_text }}</small>{% endif %}
+      {% for error in form.username.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    </label>
+    <label>
+      {{ form.first_name.label_tag }}
+      {{ form.first_name }}
+      {% for error in form.first_name.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    </label>
+    <label>
+      {{ form.last_name.label_tag }}
+      {{ form.last_name }}
+      {% for error in form.last_name.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    </label>
+    <label>
+      {{ form.phone_number.label_tag }}
+      {{ form.phone_number }}
+      {% for error in form.phone_number.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    </label>
+    <label>
+      {{ form.birth_date.label_tag }}
+      {{ form.birth_date }}
+      {% for error in form.birth_date.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    </label>
+    <label>
+      {{ form.email.label_tag }}
+      {{ form.email }}
+      {% for error in form.email.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    </label>
+    <label>
+      {{ form.password1.label_tag }}
+      {{ form.password1 }}
+      {% for error in form.password1.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    </label>
+    <label>
+      {{ form.password2.label_tag }}
+      {{ form.password2 }}
+      {% for error in form.password2.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    </label>
+  </div>
+  <button type="submit">完成註冊</button>
+</form>
+<p>已經有帳號？<a href="{% url 'accounts:login' %}">點此登入</a></p>
+{% endblock %}

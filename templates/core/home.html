@@ -10,7 +10,11 @@
     <article>
       <h2>病患</h2>
       <p>預約掛號、查看看診進度、管理家屬。</p>
-      <a href="{% url 'patients:dashboard' %}" role="button">病患儀表板</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'patients:dashboard' %}" role="button">病患儀表板</a>
+      {% else %}
+        <a href="{% url 'accounts:register' %}" role="button">立即註冊</a>
+      {% endif %}
     </article>
     <article>
       <h2>櫃檯人員</h2>

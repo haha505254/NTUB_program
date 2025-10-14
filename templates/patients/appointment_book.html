@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}預約門診{% endblock %}
+
+{% block content %}
+<h1>預約門診</h1>
+<section>
+  <h2>門診資訊</h2>
+  <ul>
+    <li>日期：{{ schedule.date }}</li>
+    <li>時段：{{ schedule.get_session_display }}</li>
+    <li>科別：{{ schedule.doctor.department.name }}</li>
+    <li>醫師：{{ schedule.doctor.user.display_name }}</li>
+    <li>剩餘名額：{{ schedule.remaining_quota }} / {{ schedule.quota }}</li>
+  </ul>
+</section>
+<form method="post">
+  {% csrf_token %}
+  <label>
+    {{ form.family_member.label_tag }}
+    {{ form.family_member }}
+    {% for error in form.family_member.errors %}<small class="error">{{ error }}</small>{% endfor %}
+  </label>
+  <label>
+    {{ form.notes.label_tag }}
+    {{ form.notes }}
+    {% for error in form.notes.errors %}<small class="error">{{ error }}</small>{% endfor %}
+  </label>
+  {% for error in form.non_field_errors %}<small class="error">{{ error }}</small>{% endfor %}
+  <button type="submit">送出預約</button>
+  <a href="{% url 'patients:schedule-search' %}" role="button" class="secondary">返回查詢</a>
+</form>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}家屬管理{% endblock %}
+
+{% block content %}
+<h1>家屬管理</h1>
+<p>
+  <a href="{% url 'patients:family-add' %}" role="button">新增家屬</a>
+  <a href="{% url 'patients:dashboard' %}" role="button" class="secondary">返回儀表板</a>
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>姓名</th>
+      <th>關係</th>
+      <th>身分證/護照</th>
+      <th>生日</th>
+      <th>聯絡電話</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for member in family_members %}
+      <tr>
+        <td>{{ member.full_name }}</td>
+        <td>{{ member.relationship }}</td>
+        <td>{{ member.national_id|default:"-" }}</td>
+        <td>{{ member.birth_date|default:"-" }}</td>
+        <td>{{ member.phone|default:"-" }}</td>
+        <td>
+          <a href="{% url 'patients:family-edit' member.pk %}" role="button" class="secondary">編輯</a>
+          <form method="post" action="{% url 'patients:family-delete' member.pk %}" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="secondary" onclick="return confirm('確定刪除？');">刪除</button>
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="6">尚未新增家屬資料。</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -6,7 +6,22 @@
 <h1>病患儀表板</h1>
 <p>在這裡可以快速進行預約掛號、查看看診進度與管理家屬資訊。</p>
 <ul>
+  <li><a href="{% url 'patients:schedule-search' %}">查詢門診班表與預約</a></li>
   <li><a href="{% url 'patients:appointments' %}">掛號紀錄</a></li>
+  <li><a href="{% url 'patients:family' %}">家屬管理{% if family_count is not None %}（{{ family_count }}）{% endif %}</a></li>
   <li><a href="{% url 'accounts:switch' %}">切換其他角色</a></li>
 </ul>
+
+{% if upcoming_appointments %}
+  <h2>即將到來的掛號</h2>
+  <ul>
+    {% for item in upcoming_appointments %}
+      <li>
+        {{ item.schedule.date }} {{ item.schedule.get_session_display }} -
+        {{ item.schedule.doctor.user.display_name }}（{{ item.schedule.doctor.department.name }}）
+        ，號碼 {{ item.queue_number }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}看診進度{% endblock %}
+
+{% block content %}
+<h1>看診進度</h1>
+<section>
+  <h2>您的掛號</h2>
+  <ul>
+    <li>日期：{{ schedule.date }} {{ schedule.get_session_display }}</li>
+    <li>科別：{{ schedule.doctor.department.name }}</li>
+    <li>醫師：{{ schedule.doctor.user.display_name }}</li>
+    <li>您的號碼：{{ appointment.queue_number }}</li>
+    <li>目前狀態：{{ appointment.get_status_display }}</li>
+  </ul>
+</section>
+<section>
+  <h2>門診狀態</h2>
+  <ul>
+    <li>目前看診號碼：{% if current_number %}{{ current_number }}{% else %}尚未叫號{% endif %}</li>
+    <li>已報到人數：{{ checked_in_count }}</li>
+    <li>等待人數：{{ waiting_count }}</li>
+    <li>已完成：{{ completed_count }}</li>
+  </ul>
+</section>
+<section>
+  <h2>最新事件</h2>
+  <ul>
+    {% for event in events %}
+      <li>
+        {{ event.created_at|date:"m/d H:i" }} - {{ event.get_event_display }}（號碼 {{ event.appointment.queue_number }}）
+        {% if event.actor %} — 由 {{ event.actor.get_username }}{% endif %}
+      </li>
+    {% empty %}
+      <li>尚無事件紀錄。</li>
+    {% endfor %}
+  </ul>
+</section>
+<p><a href="{% url 'patients:appointments' %}">返回掛號紀錄</a></p>
+{% endblock %}
