@@ -84,23 +84,8 @@ DATABASES = {
 DATABASES["default"]["CONN_MAX_AGE"] = int(os.environ.get("DJANGO_DB_CONN_MAX_AGE", 600))
 
 
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
-]
+# Password validation — 為了允許簡易密碼，關閉預設驗證規則
+AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = []
 
 
 # Internationalization
