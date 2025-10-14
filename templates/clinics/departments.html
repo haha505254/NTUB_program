@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}科別列表{% endblock %}
+
+{% block content %}
+<h1>科別列表</h1>
+<ul>
+  {% for dept in departments %}
+    <li>
+      <strong>{{ dept.name }}</strong>
+      {% if dept.description %}<p>{{ dept.description }}</p>{% endif %}
+    </li>
+  {% empty %}
+    <li>尚未建立科別資料。</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}智慧醫院掛號系統{% endblock %}
+
+{% block content %}
+<section>
+  <h1>智慧醫院掛號服務系統</h1>
+  <p>歡迎使用智慧醫療門診掛號系統，請先登入或選擇角色儀表板進行操作。</p>
+  <div class="grid">
+    <article>
+      <h2>病患</h2>
+      <p>預約掛號、查看看診進度、管理家屬。</p>
+      <a href="{% url 'patients:dashboard' %}" role="button">病患儀表板</a>
+    </article>
+    <article>
+      <h2>櫃檯人員</h2>
+      <p>處理現場掛號、報到、門診狀態查詢。</p>
+      <a href="{% url 'registrations:staff-dashboard' %}" role="button">櫃檯儀表板</a>
+    </article>
+    <article>
+      <h2>醫師/護理師</h2>
+      <p>查看今日報到名單、叫號、調整門診狀態。</p>
+      <a href="{% url 'registrations:doctor-dashboard' %}" role="button">診間儀表板</a>
+    </article>
+    <article>
+      <h2>系統管理員</h2>
+      <p>維護醫師班表、科別資訊、公告與統計。</p>
+      <a href="{% url 'administration:dashboard' %}" role="button">管理後台</a>
+    </article>
+  </div>
+</section>
+{% endblock %}

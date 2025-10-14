@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}櫃檯儀表板{% endblock %}
+
+{% block content %}
+<h1>櫃檯作業</h1>
+<p>此頁面將整合現場掛號、報到與門診狀態查詢功能。</p>
+<ul>
+  <li><a href="{% url 'registrations:clinic-status' %}">查看門診狀態</a></li>
+</ul>
+{% endblock %}

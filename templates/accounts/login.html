@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}登入{% endblock %}
+
+{% block content %}
+<section>
+  <h1>登入系統</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <label>
+      帳號
+      {{ form.username }}
+    </label>
+    <label>
+      密碼
+      {{ form.password }}
+    </label>
+    <button type="submit">登入</button>
+  </form>
+</section>
+{% endblock %}

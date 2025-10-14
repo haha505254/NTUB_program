@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}公告管理{% endblock %}
+
+{% block content %}
+<h1>公告管理</h1>
+<table>
+  <thead>
+    <tr>
+      <th>標題</th>
+      <th>發布時間</th>
+      <th>結束時間</th>
+      <th>狀態</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in announcements %}
+      <tr>
+        <td>{{ item.title }}</td>
+        <td>{{ item.publish_at }}</td>
+        <td>{{ item.expire_at|default:"-" }}</td>
+        <td>{% if item.is_active %}啟用{% else %}停用{% endif %}</td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="4">尚未建立公告。</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

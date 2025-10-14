@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}病患儀表板{% endblock %}
+
+{% block content %}
+<h1>病患儀表板</h1>
+<p>在這裡可以快速進行預約掛號、查看看診進度與管理家屬資訊。</p>
+<ul>
+  <li><a href="{% url 'patients:appointments' %}">掛號紀錄</a></li>
+  <li><a href="{% url 'accounts:switch' %}">切換其他角色</a></li>
+</ul>
+{% endblock %}

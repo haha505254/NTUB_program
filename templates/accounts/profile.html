@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}個人資料{% endblock %}
+
+{% block content %}
+<section>
+  <h1>個人資料</h1>
+  <ul>
+    <li>帳號：{{ request.user.username }}</li>
+    <li>姓名：{{ request.user.get_full_name }}</li>
+    <li>角色：{{ request.user.get_role_display|default:"-" }}</li>
+    <li>電子郵件：{{ request.user.email }}</li>
+    <li>電話：{{ request.user.phone_number }}</li>
+  </ul>
+</section>
+{% endblock %}

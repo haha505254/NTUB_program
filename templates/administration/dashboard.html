@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}管理後台{% endblock %}
+
+{% block content %}
+<h1>管理後台</h1>
+<p>用於設定醫師班表、科別與系統作業的主控台。</p>
+<ul>
+  <li><a href="{% url 'administration:announcements' %}">公告管理</a></li>
+  <li><a href="{% url 'clinics:departments' %}">科別設定</a></li>
+</ul>
+{% endblock %}
