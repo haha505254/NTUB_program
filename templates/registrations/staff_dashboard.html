@@ -4,8 +4,122 @@
 
 {% block content %}
 <h1>櫃檯作業</h1>
-<p>此頁面將整合現場掛號、報到與門診狀態查詢功能。</p>
-<ul>
-  <li><a href="{% url 'registrations:clinic-status' %}">查看門診狀態</a></li>
-</ul>
+<p>提供病患查詢、現場掛號、報到與資料維護的工作台。</p>
+
+<section>
+  <h2>病患查詢</h2>
+  <form method="get" class="stack">
+    <div>
+      {{ search_form.identifier.label_tag }}
+      {{ search_form.identifier }}
+    </div>
+    <button type="submit">查詢病患</button>
+    <p class="help-text">可輸入病歷號或身分證號。</p>
+  </form>
+</section>
+
+<section>
+  <h2>新增病患</h2>
+  <form method="post" action="{% url 'registrations:staff-patient-create' %}" class="stack">
+    {% csrf_token %}
+    {% for field in patient_create_form %}
+    <div>
+      {{ field.label_tag }}
+      {{ field }}
+      {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit">建立病患資料</button>
+  </form>
+</section>
+
+{% if selected_patient %}
+<section>
+  <h2>病患資料</h2>
+  <p>
+    病歷號：<strong>{{ selected_patient.medical_record_number }}</strong> ／
+    姓名：<strong>{{ selected_patient.user.display_name }}</strong>
+  </p>
+  <form method="post" action="{% url 'registrations:staff-patient-update' selected_patient.pk %}" class="stack">
+    {% csrf_token %}
+    {% for field in patient_form %}
+    <div>
+      {{ field.label_tag }}
+      {{ field }}
+      {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit">儲存資料</button>
+  </form>
+</section>
+
+<section>
+  <h2>現場掛號</h2>
+  <form method="post" action="{% url 'registrations:staff-appointment-create' selected_patient.pk %}" class="stack">
+    {% csrf_token %}
+    {% for field in appointment_form %}
+    <div>
+      {{ field.label_tag }}
+      {{ field }}
+      {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit">建立掛號</button>
+    <p class="help-text">只會顯示今日起尚可掛號的門診時段。</p>
+  </form>
+</section>
+
+<section>
+  <h2>掛號紀錄</h2>
+  {% if appointments %}
+  <table>
+    <thead>
+      <tr>
+        <th>號碼</th>
+        <th>門診資訊</th>
+        <th>狀態</th>
+        <th>動作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for appointment in appointments %}
+      <tr>
+        <td>#{{ appointment.queue_number }}</td>
+        <td>
+          {{ appointment.schedule.date|date:"Y-m-d" }}
+          {{ appointment.schedule.get_session_display }} ／
+          {{ appointment.schedule.doctor.department.name }}
+          {{ appointment.schedule.doctor.user.display_name }}
+        </td>
+        <td>{{ appointment.get_status_display }}</td>
+        <td>
+          {% if appointment.status == 'reserved' %}
+          <form method="post" action="{% url 'registrations:staff-appointment-check-in' appointment.pk %}">
+            {% csrf_token %}
+            <button type="submit">報到</button>
+          </form>
+          {% endif %}
+          {% if appointment.status != 'cancelled' and appointment.status != 'completed' %}
+          <form method="post" action="{% url 'registrations:staff-appointment-cancel' appointment.pk %}" class="mt-1">
+            {% csrf_token %}
+            <button type="submit">取消</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>目前尚無掛號紀錄。</p>
+  {% endif %}
+</section>
+{% endif %}
+
+<section>
+  <h2>快速連結</h2>
+  <ul>
+    <li><a href="{% url 'registrations:clinic-status' %}">查看門診狀態</a></li>
+  </ul>
+</section>
 {% endblock %}

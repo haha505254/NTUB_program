@@ -4,5 +4,93 @@
 
 {% block content %}
 <h1>門診狀態</h1>
-<p>後續將顯示每個門診的掛號人數、報到人數與叫號狀態。</p>
+<p>依日期檢視各科別門診的掛號、報到與叫號進度。</p>
+
+<section>
+  <h2>篩選條件</h2>
+  <form method="get" class="stack">
+    <div>
+      {{ filter_form.date.label_tag }}
+      {{ filter_form.date }}
+    </div>
+    <div>
+      {{ filter_form.department.label_tag }}
+      {{ filter_form.department }}
+    </div>
+    <div>
+      {{ filter_form.doctor.label_tag }}
+      {{ filter_form.doctor }}
+    </div>
+    <button type="submit">套用條件</button>
+  </form>
+  <p class="help-text">顯示日期：{{ selected_date|date:"Y-m-d" }}</p>
+</section>
+
+{% if schedules %}
+  {% for block in schedules %}
+  <article class="mt-2">
+    <h2>
+      {{ block.schedule.doctor.department.name }} ／
+      {{ block.schedule.doctor.user.display_name }}
+      （{{ block.schedule.date|date:"Y-m-d" }} {{ block.schedule.get_session_display }}）
+    </h2>
+    <p>
+      名額：{{ block.schedule.quota }}人，
+      已預約：{{ block.counts.total_active }}人，
+      已報到：{{ block.counts.checked_in }}人，
+      看診中：{{ block.counts.in_progress }}人，
+      已完成：{{ block.counts.completed }}人，
+      剩餘名額：{{ block.schedule.remaining_quota }}人。
+      目前叫號：{{ block.counts.current_number }} 號。
+    </p>
+    {% if block.appointments %}
+    <table>
+      <thead>
+        <tr>
+          <th>號碼</th>
+          <th>病患</th>
+          <th>就診對象</th>
+          <th>狀態</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in block.appointments %}
+        <tr>
+          <td>#{{ appointment.queue_number }}</td>
+          <td>{{ appointment.patient.user.display_name }}</td>
+          <td>
+            {% if appointment.family_member %}
+              {{ appointment.family_member.full_name }} ({{ appointment.family_member.relationship }})
+            {% else %}
+              本人
+            {% endif %}
+          </td>
+          <td>{{ appointment.get_status_display }}</td>
+          <td>
+            {% if appointment.status == 'reserved' %}
+            <form method="post" action="{% url 'registrations:staff-appointment-check-in' appointment.pk %}">
+              {% csrf_token %}
+              <button type="submit">報到</button>
+            </form>
+            {% endif %}
+            {% if appointment.status != 'cancelled' and appointment.status != 'completed' %}
+            <form method="post" action="{% url 'registrations:staff-appointment-cancel' appointment.pk %}" class="mt-1">
+              {% csrf_token %}
+              <button type="submit">取消</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>尚無掛號紀錄。</p>
+    {% endif %}
+  </article>
+  {% endfor %}
+{% else %}
+  <p>所選條件下沒有門診班表。</p>
+{% endif %}
 {% endblock %}
