@@ -4,5 +4,235 @@
 
 {% block content %}
 <h1>診間儀表板</h1>
-<p>顯示今日報到名單與叫號紀錄的頁面，後續可串接即時更新。</p>
+
+<section>
+  <h2>門診列表</h2>
+  <form method="get" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+    <div>
+      <label for="date">日期</label>
+      <input type="date" id="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" />
+    </div>
+    <div style="align-self: end;">
+      {% if selected_schedule %}
+      <input type="hidden" name="schedule" value="{{ selected_schedule.pk }}" />
+      {% endif %}
+      <button type="submit">切換日期</button>
+    </div>
+  </form>
+
+  {% if schedule_blocks %}
+  <table>
+    <thead>
+      <tr>
+        <th>門診</th>
+        <th>狀態</th>
+        <th>待報到</th>
+        <th>已報到</th>
+        <th>看診中</th>
+        <th>已完成</th>
+        <th>取消</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for block in schedule_blocks %}
+      {% with schedule=block.schedule counts=block.counts %}
+      <tr{% if selected_schedule and schedule.pk == selected_schedule.pk %} class="contrast"{% endif %}>
+        <td>
+          <a href="{% url 'registrations:doctor-dashboard' %}?date={{ selected_date|date:'Y-m-d' }}&schedule={{ schedule.pk }}">
+            {{ schedule.doctor.department.name }} {{ schedule.get_session_display }}
+          </a>
+        </td>
+        <td>{{ schedule.get_status_display }}</td>
+        <td>{{ counts.reserved }}</td>
+        <td>{{ counts.checked_in }}</td>
+        <td>{{ counts.in_progress }}</td>
+        <td>{{ counts.completed }}</td>
+        <td>{{ counts.cancelled }}</td>
+      </tr>
+      {% endwith %}
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>此日期無門診班表。</p>
+  {% endif %}
+</section>
+
+{% if selected_schedule %}
+<section class="mt-2">
+  <h2>門診詳細</h2>
+  <p>
+    日期：{{ selected_schedule.date|date:'Y-m-d' }} ／
+    診間：{{ selected_schedule.clinic_room|default:'未指定' }} ／
+    現況：<strong>{{ selected_schedule.get_status_display }}</strong>
+  </p>
+
+  <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+    {% if call_form %}
+    <div>
+      <h3>叫號</h3>
+      <form method="post" action="{% url 'registrations:doctor-call-next' %}" class="stack">
+        {% csrf_token %}
+        {{ call_form.schedule_id }}
+        <button type="submit">叫下一位</button>
+        <small class="help-text">僅會叫出最早報到且尚未看診的病患。</small>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if complete_form and current_appointment %}
+    <div>
+      <h3>看診中</h3>
+      <p>
+        號碼：#{{ current_appointment.queue_number }}<br>
+        病患：{{ current_appointment.patient.user.display_name }}
+        {% if current_appointment.family_member %}<br>就診對象：{{ current_appointment.family_member.full_name }}{% endif %}
+      </p>
+      <form method="post" action="{% url 'registrations:doctor-complete-appointment' %}">
+        {% csrf_token %}
+        {{ complete_form.appointment_id }}
+        <button type="submit">標記完成</button>
+      </form>
+    </div>
+    {% else %}
+    <div>
+      <h3>看診中</h3>
+      <p>目前沒有看診中的病患。</p>
+    </div>
+    {% endif %}
+
+    {% if schedule_action_form %}
+    <div>
+      <h3>門診狀態</h3>
+      <form method="post" action="{% url 'registrations:doctor-schedule-action' %}" class="stack">
+        {% csrf_token %}
+        {{ schedule_action_form.schedule_id }}
+        <label for="action">操作</label>
+        {{ schedule_action_form.action }}
+        <button type="submit">套用</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="mt-2">
+  <h2>候診名單</h2>
+  {% if checked_in_appointments %}
+  <details open>
+    <summary>已報到 ({{ checked_in_appointments|length }})</summary>
+    <table>
+      <thead>
+        <tr>
+          <th>號碼</th>
+          <th>病患</th>
+          <th>就診對象</th>
+          <th>報到時間</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in checked_in_appointments %}
+        <tr>
+          <td>#{{ appointment.queue_number }}</td>
+          <td>{{ appointment.patient.user.display_name }}</td>
+          <td>
+            {% if appointment.family_member %}
+              {{ appointment.family_member.full_name }} ({{ appointment.family_member.relationship }})
+            {% else %}
+              本人
+            {% endif %}
+          </td>
+          <td>{{ appointment.check_in_at|date:'H:i' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+  {% else %}
+  <p>沒有已報到的病患。</p>
+  {% endif %}
+
+  {% if waiting_appointments %}
+  <details class="mt-1">
+    <summary>未報到 ({{ waiting_appointments|length }})</summary>
+    <table>
+      <thead>
+        <tr>
+          <th>號碼</th>
+          <th>病患</th>
+          <th>就診對象</th>
+          <th>備註</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in waiting_appointments %}
+        <tr>
+          <td>#{{ appointment.queue_number }}</td>
+          <td>{{ appointment.patient.user.display_name }}</td>
+          <td>
+            {% if appointment.family_member %}
+              {{ appointment.family_member.full_name }} ({{ appointment.family_member.relationship }})
+            {% else %}
+              本人
+            {% endif %}
+          </td>
+          <td>{{ appointment.notes|default:"" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+  {% endif %}
+</section>
+
+<section class="mt-2">
+  <h2>歷史紀錄</h2>
+  {% if completed_appointments %}
+  <details>
+    <summary>已完成 ({{ completed_appointments|length }})</summary>
+    <table>
+      <thead>
+        <tr>
+          <th>號碼</th>
+          <th>病患</th>
+          <th>完成時間</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in completed_appointments %}
+        <tr>
+          <td>#{{ appointment.queue_number }}</td>
+          <td>{{ appointment.patient.user.display_name }}</td>
+          <td>{{ appointment.completed_at|date:'H:i' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+  {% else %}
+  <p>尚無完成的掛號紀錄。</p>
+  {% endif %}
+</section>
+
+<section class="mt-2">
+  <h2>事件紀錄</h2>
+  {% if recent_events %}
+  <ul>
+    {% for event in recent_events %}
+    <li>
+      {{ event.created_at|date:'H:i' }} -
+      #{{ event.appointment.queue_number }}
+      {{ event.appointment.patient.user.display_name }}
+      ：{{ event.get_event_display }}
+      {% if event.actor %}（{{ event.actor.display_name|default:event.actor.username }}）{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>尚無事件紀錄。</p>
+  {% endif %}
+</section>
+{% else %}
+<p>請先選擇門診以檢視詳細資訊。</p>
+{% endif %}
 {% endblock %}

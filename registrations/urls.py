@@ -3,6 +3,9 @@ from django.urls import path
 from .views import (
     ClinicStatusView,
     DoctorDashboardView,
+    DoctorCallNextView,
+    DoctorCompleteAppointmentView,
+    DoctorScheduleActionView,
     StaffAppointmentCancelView,
     StaffAppointmentCheckInView,
     StaffDashboardView,
@@ -33,5 +36,16 @@ urlpatterns = [
         name="staff-appointment-cancel",
     ),
     path("doctor/dashboard/", DoctorDashboardView.as_view(), name="doctor-dashboard"),
+    path("doctor/call-next/", DoctorCallNextView.as_view(), name="doctor-call-next"),
+    path(
+        "doctor/complete/",
+        DoctorCompleteAppointmentView.as_view(),
+        name="doctor-complete-appointment",
+    ),
+    path(
+        "doctor/schedule-action/",
+        DoctorScheduleActionView.as_view(),
+        name="doctor-schedule-action",
+    ),
     path("clinic-status/", ClinicStatusView.as_view(), name="clinic-status"),
 ]

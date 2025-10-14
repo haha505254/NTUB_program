@@ -1,17 +1,17 @@
 from __future__ import annotations
 
 from django import forms
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.forms import AdminUserCreationForm, UserChangeForm, UserCreationForm
 
 from patients.models import Patient
 
 from .models import User
 
 
-class HospitalUserCreationForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
+class HospitalUserCreationForm(AdminUserCreationForm):
+    class Meta(AdminUserCreationForm.Meta):
         model = User
-        fields = UserCreationForm.Meta.fields + ("role", "phone_number")
+        fields = AdminUserCreationForm.Meta.fields + ("role", "phone_number")
 
 
 class HospitalUserChangeForm(UserChangeForm):

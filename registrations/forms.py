@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django import forms
 from django.contrib.auth import get_user_model
-from django.db import transaction
+from django.db import models, transaction
 from django.utils import timezone
 
 from clinics.models import Department
@@ -289,3 +289,100 @@ class ClinicStatusFilterForm(forms.Form):
         if doctor is not None and not doctor.is_active:
             raise forms.ValidationError("該醫師目前未開放門診。")
         return doctor
+
+
+class DoctorActionBaseForm(forms.Form):
+    """Base helper to驗證醫師操作的門診/掛號資料。"""
+
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.doctor = getattr(user, "doctor_profile", None)
+        self.schedule: DoctorSchedule | None = None
+        self.appointment: Appointment | None = None
+
+    def _ensure_doctor_access(self, schedule: DoctorSchedule):
+        if self.doctor and schedule.doctor_id != self.doctor.pk:
+            raise forms.ValidationError("僅能操作自己的門診班表。")
+        if not self.doctor and not (self.user.is_superuser or getattr(self.user, "role", "") == "admin"):
+            raise forms.ValidationError("沒有權限操作此門診。")
+
+
+class DoctorCallNextForm(DoctorActionBaseForm):
+    schedule_id = forms.IntegerField(widget=forms.HiddenInput)
+
+    def clean_schedule_id(self):
+        schedule_id = self.cleaned_data["schedule_id"]
+        try:
+            schedule = DoctorSchedule.objects.select_related("doctor", "doctor__user").get(pk=schedule_id)
+        except DoctorSchedule.DoesNotExist as exc:  # pragma: no cover - 使用者輸入錯誤
+            raise forms.ValidationError("找不到指定門診。") from exc
+        self._ensure_doctor_access(schedule)
+        if schedule.status == DoctorSchedule.Status.ENDED:
+            raise forms.ValidationError("此門診已結束，無法叫號。")
+        self.schedule = schedule
+        return schedule_id
+
+
+class DoctorCompleteAppointmentForm(DoctorActionBaseForm):
+    appointment_id = forms.IntegerField(widget=forms.HiddenInput)
+
+    def clean_appointment_id(self):
+        appointment_id = self.cleaned_data["appointment_id"]
+        try:
+            appointment = (
+                Appointment.objects.select_related(
+                    "schedule",
+                    "schedule__doctor",
+                    "schedule__doctor__user",
+                    "patient",
+                    "patient__user",
+                ).get(pk=appointment_id)
+            )
+        except Appointment.DoesNotExist as exc:  # pragma: no cover - 使用者輸入錯誤
+            raise forms.ValidationError("找不到指定掛號。") from exc
+
+        self._ensure_doctor_access(appointment.schedule)
+        if appointment.status != Appointment.Status.IN_PROGRESS:
+            raise forms.ValidationError("僅能標記看診中的病患為完成。")
+        self.schedule = appointment.schedule
+        self.appointment = appointment
+        return appointment_id
+
+
+class DoctorScheduleActionForm(DoctorActionBaseForm):
+    class Action(models.TextChoices):
+        PAUSE = "pause", "暫停看診"
+        RESUME = "resume", "恢復看診"
+        END = "end", "看診結束"
+
+    schedule_id = forms.IntegerField(widget=forms.HiddenInput)
+    action = forms.ChoiceField(choices=Action.choices)
+
+    def clean_schedule_id(self):
+        schedule_id = self.cleaned_data["schedule_id"]
+        try:
+            schedule = DoctorSchedule.objects.select_related("doctor", "doctor__user").get(pk=schedule_id)
+        except DoctorSchedule.DoesNotExist as exc:  # pragma: no cover - 使用者輸入錯誤
+            raise forms.ValidationError("找不到指定門診。") from exc
+        self._ensure_doctor_access(schedule)
+        self.schedule = schedule
+        return schedule_id
+
+    def clean(self):
+        cleaned = super().clean()
+        schedule: DoctorSchedule | None = self.schedule
+        action = cleaned.get("action")
+        if not schedule or not action:
+            return cleaned
+
+        if action == self.Action.PAUSE and schedule.status not in {
+            DoctorSchedule.Status.OPEN,
+            DoctorSchedule.Status.CLOSED,
+        }:
+            raise forms.ValidationError("僅能在開診狀態暫停門診。")
+        if action == self.Action.RESUME and schedule.status != DoctorSchedule.Status.PAUSED:
+            raise forms.ValidationError("目前並非暫停狀態。")
+        if action == self.Action.END and schedule.status == DoctorSchedule.Status.ENDED:
+            raise forms.ValidationError("此門診已標記為結束。")
+        return cleaned
