@@ -9,11 +9,14 @@ __pycache__/
 .venv/
 .env
 *.env
+.env.docker
 
 # Django
 /staticfiles/
 /media/
 db.sqlite3
+.docker-data/
+/docs/
 
 # IDE
 .vscode/

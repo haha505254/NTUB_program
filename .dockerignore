@@ -1,0 +1,15 @@
+.git
+.github
+__pycache__/
+*.py[cod]
+*.swp
+.venv/
+env/
+.env
+*.env
+db.sqlite3
+media/
+staticfiles/
+docs/
+.pytest_cache/
+.mypy_cache/
