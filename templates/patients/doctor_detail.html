@@ -4,9 +4,11 @@
 
 {% block content %}
 <h1>{{ doctor.user.display_name }}</h1>
-<p><strong>科別：</strong> {{ doctor.department.name }}</p>
-{% if doctor.title %}<p><strong>職稱：</strong> {{ doctor.title }}</p>{% endif %}
-{% if doctor.specialties %}<p><strong>專長：</strong> {{ doctor.specialties }}</p>{% endif %}
-{% if doctor.bio %}<p><strong>簡介：</strong> {{ doctor.bio }}</p>{% endif %}
-<p>科別更多班表可回 <a href="{% url 'patients:schedule-search' %}">班表查詢</a> 查看。</p>
+<div class="card doctor-profile">
+  <p><strong>科別：</strong> {{ doctor.department.name }}</p>
+  {% if doctor.title %}<p><strong>職稱：</strong> {{ doctor.title }}</p>{% endif %}
+  {% if doctor.specialties %}<p><strong>專長：</strong> {{ doctor.specialties }}</p>{% endif %}
+  {% if doctor.bio %}<p><strong>簡介：</strong> {{ doctor.bio }}</p>{% endif %}
+  <p class="help-text">科別更多班表可回 <a href="{% url 'patients:schedule-search' %}">班表查詢</a> 查看。</p>
+</div>
 {% endblock %}

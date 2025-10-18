@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>預約門診</h1>
-<section>
+<section class="card">
   <h2>門診資訊</h2>
   <ul>
     <li>日期：{{ schedule.date }}</li>
@@ -14,7 +14,7 @@
     <li>剩餘名額：{{ schedule.remaining_quota }} / {{ schedule.quota }}</li>
   </ul>
 </section>
-<form method="post">
+<form method="post" class="stack">
   {% csrf_token %}
   <label>
     {{ form.family_member.label_tag }}
@@ -27,7 +27,9 @@
     {% for error in form.notes.errors %}<small class="error">{{ error }}</small>{% endfor %}
   </label>
   {% for error in form.non_field_errors %}<small class="error">{{ error }}</small>{% endfor %}
-  <button type="submit">送出預約</button>
-  <a href="{% url 'patients:schedule-search' %}" role="button" class="secondary">返回查詢</a>
+  <div class="form-actions">
+    <button type="submit">送出預約</button>
+    <a href="{% url 'patients:schedule-search' %}" role="button" class="secondary">返回查詢</a>
+  </div>
 </form>
 {% endblock %}

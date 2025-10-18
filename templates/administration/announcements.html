@@ -5,12 +5,12 @@
 {% block admin_content %}
 <h1>公告管理</h1>
 
-<form method="get" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; align-items: end;">
-  <div>
+<form method="get" class="filter-bar">
+  <div class="field">
     <label for="announcement-search">關鍵字</label>
     <input type="search" id="announcement-search" name="q" placeholder="搜尋標題或內容" value="{{ search_query }}">
   </div>
-  <div>
+  <div class="field">
     <label for="announcement-status">狀態</label>
     <select id="announcement-status" name="status">
       <option value="all" {% if status_filter == "all" %}selected{% endif %}>全部</option>
@@ -20,11 +20,11 @@
       <option value="inactive" {% if status_filter == "inactive" %}selected{% endif %}>停用</option>
     </select>
   </div>
-  <div style="display: flex; gap: 0.5rem;">
-    <button type="submit" class="secondary">套用條件</button>
-    <a href="{% url 'administration:announcements' %}" role="button" class="secondary">清除</a>
-    <span style="flex-grow: 1;"></span>
-    <a href="{% url 'administration:announcements-add' %}" role="button">新增公告</a>
+  <div class="field-actions">
+    <button type="submit" class="secondary btn-compact">套用條件</button>
+    <a href="{% url 'administration:announcements' %}" role="button" class="secondary btn-compact">清除</a>
+    <span class="spacer"></span>
+    <a href="{% url 'administration:announcements-add' %}" role="button" class="btn-compact">新增公告</a>
   </div>
 </form>
 
@@ -49,25 +49,25 @@
         <td>{{ item.expire_at|date:"Y-m-d H:i"|default:"-" }}</td>
         <td>
           {% if item.is_active %}
-            <span class="contrast" style="padding: 0.2rem 0.4rem; border-radius: 0.25rem;">啟用</span>
+            <span class="badge">啟用</span>
           {% else %}
-            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">停用</span>
+            <span class="badge badge-muted">停用</span>
           {% endif %}
         </td>
-        <td>
-          <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.4rem;">
-            <a href="{% url 'administration:announcements-edit' item.pk %}" class="secondary" role="button">編輯</a>
+        <td class="actions">
+          <div class="button-set">
+            <a href="{% url 'administration:announcements-edit' item.pk %}" class="secondary btn-compact" role="button">編輯</a>
             <form method="post" action="{% url 'administration:announcements-toggle' item.pk %}">
               {% csrf_token %}
               {% if item.is_active %}
-                <button type="submit" class="secondary">停用</button>
+                <button type="submit" class="secondary btn-compact">停用</button>
               {% else %}
-                <button type="submit">啟用</button>
+                <button type="submit" class="btn-compact">啟用</button>
               {% endif %}
             </form>
             <form method="post" action="{% url 'administration:announcements-delete' item.pk %}">
               {% csrf_token %}
-              <button type="submit" class="secondary" onclick="return confirm('確認要刪除公告？');">刪除</button>
+              <button type="submit" class="secondary btn-compact" onclick="return confirm('確認要刪除公告？');">刪除</button>
             </form>
           </div>
         </td>

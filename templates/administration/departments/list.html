@@ -3,18 +3,28 @@
 {% block admin_page_title %}科別管理{% endblock %}
 
 {% block admin_content %}
-<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: end;">
-  <h1 style="grid-column: 1 / -1; margin-bottom: 0;">科別管理</h1>
-  <form method="get" class="grid" style="grid-template-columns: 1fr auto; gap: 0.5rem;">
-    <input type="search" id="q" name="q" placeholder="搜尋名稱或代碼" value="{{ search_query }}" aria-label="搜尋科別">
-    <button type="submit" class="secondary">搜尋</button>
-  </form>
-  <div style="text-align: right;">
-    <a href="{% url 'administration:departments-add' %}" role="button">新增科別</a>
+<div class="page-header">
+  <div>
+    <h1>科別管理</h1>
+    <p class="help-text">停用的科別不會出現在掛號查詢與班表設定中。</p>
+  </div>
+  <div class="actions">
+    <a href="{% url 'administration:departments-add' %}" role="button" class="btn-compact">新增科別</a>
   </div>
 </div>
 
-<p class="help-text">停用的科別不會出現在掛號查詢與班表設定中。</p>
+<form method="get" class="filter-bar">
+  <div class="field">
+    <label for="q">搜尋關鍵字</label>
+    <input type="search" id="q" name="q" placeholder="搜尋名稱或代碼" value="{{ search_query }}" aria-label="搜尋科別">
+  </div>
+  <div class="field-actions">
+    <button type="submit" class="secondary btn-compact">搜尋</button>
+    {% if search_query %}
+      <a href="{% url 'administration:departments' %}" role="button" class="secondary btn-compact">清除</a>
+    {% endif %}
+  </div>
+</form>
 
 <table>
   <thead>
@@ -33,22 +43,24 @@
         <td>{{ department.name }}</td>
         <td>
           {% if department.is_active %}
-            <span class="contrast" style="padding: 0.2rem 0.4rem; border-radius: 0.25rem;">啟用</span>
+            <span class="badge">啟用</span>
           {% else %}
-            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">停用</span>
+            <span class="badge badge-muted">停用</span>
           {% endif %}
         </td>
         <td>{{ department.updated_at|date:"Y-m-d H:i" }}</td>
-        <td>
-          <a href="{% url 'administration:departments-edit' department.pk %}" class="secondary" role="button" style="margin-bottom: 0.25rem;">編輯</a>
-          <form method="post" action="{% url 'administration:departments-toggle' department.pk %}" style="display: inline;">
-            {% csrf_token %}
-            {% if department.is_active %}
-              <button type="submit" class="secondary">停用</button>
-            {% else %}
-              <button type="submit">啟用</button>
-            {% endif %}
-          </form>
+        <td class="actions">
+          <div class="button-set">
+            <a href="{% url 'administration:departments-edit' department.pk %}" class="secondary btn-compact" role="button">編輯</a>
+            <form method="post" action="{% url 'administration:departments-toggle' department.pk %}">
+              {% csrf_token %}
+              {% if department.is_active %}
+                <button type="submit" class="secondary btn-compact">停用</button>
+              {% else %}
+                <button type="submit" class="btn-compact">啟用</button>
+              {% endif %}
+            </form>
+          </div>
         </td>
       </tr>
     {% empty %}

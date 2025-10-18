@@ -6,29 +6,29 @@
 <h1>掛號統計報表</h1>
 <p class="help-text">可依日期區間、科別與醫師統計掛號狀態，並下載 CSV 匯出。</p>
 
-<form method="get" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; align-items: end;">
-  <div>
+<form method="get" class="filter-bar">
+  <div class="field">
     {{ form.start_date.label_tag }}
     {{ form.start_date }}
   </div>
-  <div>
+  <div class="field">
     {{ form.end_date.label_tag }}
     {{ form.end_date }}
   </div>
-  <div>
+  <div class="field">
     {{ form.department.label_tag }}
     {{ form.department }}
   </div>
-  <div>
+  <div class="field">
     {{ form.doctor.label_tag }}
     {{ form.doctor }}
   </div>
-  <div style="display: flex; gap: 0.5rem;">
-    <button type="submit" class="secondary">產生報表</button>
-    <a href="{% url 'administration:reports' %}" role="button" class="secondary">清除條件</a>
+  <div class="field-actions">
+    <button type="submit" class="secondary btn-compact">產生報表</button>
+    <a href="{% url 'administration:reports' %}" role="button" class="secondary btn-compact">清除條件</a>
     {% if has_result %}
-      <span style="flex-grow: 1;"></span>
-      <a href="?{{ query_string }}{% if query_string %}&{% endif %}download=csv" role="button">下載 CSV</a>
+      <span class="spacer"></span>
+      <a href="?{{ query_string }}{% if query_string %}&{% endif %}download=csv" role="button" class="btn-compact">下載 CSV</a>
     {% endif %}
   </div>
 </form>
@@ -44,33 +44,33 @@
 {% endif %}
 
 {% if has_result %}
-  <section class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
-    <article>
+  <div class="stat-grid">
+    <article class="stat-card stat-card--highlight">
       <h2>總計</h2>
-      <p style="font-size: 1.8rem; margin: 0;">{{ totals.total }}</p>
-      <p class="help-text">符合條件的掛號總筆數</p>
+      <p class="metric-value">{{ totals.total }}</p>
+      <p class="metric-caption">符合條件的掛號總筆數</p>
     </article>
-    <article>
+    <article class="stat-card">
       <h2>已預約</h2>
-      <p style="font-size: 1.4rem; margin: 0;">{{ totals.reserved }}</p>
+      <p class="metric-value">{{ totals.reserved }}</p>
     </article>
-    <article>
+    <article class="stat-card">
       <h2>已報到</h2>
-      <p style="font-size: 1.4rem; margin: 0;">{{ totals.checked_in }}</p>
+      <p class="metric-value">{{ totals.checked_in }}</p>
     </article>
-    <article>
+    <article class="stat-card">
       <h2>看診中</h2>
-      <p style="font-size: 1.4rem; margin: 0;">{{ totals.in_progress }}</p>
+      <p class="metric-value">{{ totals.in_progress }}</p>
     </article>
-    <article>
+    <article class="stat-card">
       <h2>已完成</h2>
-      <p style="font-size: 1.4rem; margin: 0;">{{ totals.completed }}</p>
+      <p class="metric-value">{{ totals.completed }}</p>
     </article>
-    <article>
+    <article class="stat-card">
       <h2>已取消</h2>
-      <p style="font-size: 1.4rem; margin: 0;">{{ totals.cancelled }}</p>
+      <p class="metric-value">{{ totals.cancelled }}</p>
     </article>
-  </section>
+  </div>
 
   <section>
     <h2>依醫師統計</h2>
@@ -142,6 +142,6 @@
     </table>
   </section>
 {% else %}
-  <p style="margin-top: 1rem;">請先設定查詢條件後產生報表。</p>
+  <p class="empty-state">請先設定查詢條件後產生報表。</p>
 {% endif %}
 {% endblock %}

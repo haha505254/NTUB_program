@@ -3,14 +3,22 @@
 {% block admin_page_title %}醫師管理{% endblock %}
 
 {% block admin_content %}
-<h1>醫師管理</h1>
-
-<form method="get" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; align-items: end;">
+<div class="page-header">
   <div>
+    <h1>醫師管理</h1>
+    <p class="help-text">維護醫師帳號、職稱與啟用狀態。</p>
+  </div>
+  <div class="actions">
+    <a href="{% url 'administration:doctors-add' %}" role="button" class="btn-compact">新增醫師</a>
+  </div>
+</div>
+
+<form method="get" class="filter-bar">
+  <div class="field">
     <label for="doctor-search">搜尋關鍵字</label>
     <input type="search" id="doctor-search" name="q" placeholder="姓名、帳號或證書號" value="{{ search_query }}">
   </div>
-  <div>
+  <div class="field">
     <label for="doctor-department">科別</label>
     <select id="doctor-department" name="department">
       <option value="">全部科別</option>
@@ -21,7 +29,7 @@
       {% endfor %}
     </select>
   </div>
-  <div>
+  <div class="field">
     <label for="doctor-status">狀態</label>
     <select id="doctor-status" name="status">
       <option value="all" {% if status_filter == "all" %}selected{% endif %}>全部</option>
@@ -29,11 +37,9 @@
       <option value="inactive" {% if status_filter == "inactive" %}selected{% endif %}>停用</option>
     </select>
   </div>
-  <div style="display: flex; gap: 0.5rem;">
-    <button type="submit" class="secondary">套用條件</button>
-    <a href="{% url 'administration:doctors' %}" role="button" class="secondary">清除</a>
-    <span style="flex-grow: 1;"></span>
-    <a href="{% url 'administration:doctors-add' %}" role="button">新增醫師</a>
+  <div class="field-actions">
+    <button type="submit" class="secondary btn-compact">套用條件</button>
+    <a href="{% url 'administration:doctors' %}" role="button" class="secondary btn-compact">清除</a>
   </div>
 </form>
 
@@ -58,22 +64,24 @@
         <td>{{ doctor.license_number }}</td>
         <td>
           {% if doctor.is_active %}
-            <span class="contrast" style="padding: 0.2rem 0.4rem; border-radius: 0.25rem;">啟用</span>
+            <span class="badge">啟用</span>
           {% else %}
-            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">停用</span>
+            <span class="badge badge-muted">停用</span>
           {% endif %}
         </td>
         <td>{{ doctor.updated_at|date:"Y-m-d H:i" }}</td>
-        <td>
-          <a href="{% url 'administration:doctors-edit' doctor.pk %}" class="secondary" role="button" style="margin-bottom: 0.25rem;">編輯</a>
-          <form method="post" action="{% url 'administration:doctors-toggle' doctor.pk %}" style="display: inline;">
-            {% csrf_token %}
-            {% if doctor.is_active %}
-              <button type="submit" class="secondary">停用</button>
-            {% else %}
-              <button type="submit">啟用</button>
-            {% endif %}
-          </form>
+        <td class="actions">
+          <div class="button-set">
+            <a href="{% url 'administration:doctors-edit' doctor.pk %}" class="secondary btn-compact" role="button">編輯</a>
+            <form method="post" action="{% url 'administration:doctors-toggle' doctor.pk %}">
+              {% csrf_token %}
+              {% if doctor.is_active %}
+                <button type="submit" class="secondary btn-compact">停用</button>
+              {% else %}
+                <button type="submit" class="btn-compact">啟用</button>
+              {% endif %}
+            </form>
+          </div>
         </td>
       </tr>
     {% empty %}

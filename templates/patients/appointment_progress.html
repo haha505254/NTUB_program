@@ -4,26 +4,44 @@
 
 {% block content %}
 <h1>看診進度</h1>
-<section>
-  <h2>您的掛號</h2>
-  <ul>
-    <li>日期：{{ schedule.date }} {{ schedule.get_session_display }}</li>
-    <li>科別：{{ schedule.doctor.department.name }}</li>
-    <li>醫師：{{ schedule.doctor.user.display_name }}</li>
-    <li>您的號碼：{{ appointment.queue_number }}</li>
-    <li>目前狀態：{{ appointment.get_status_display }}</li>
-  </ul>
-</section>
-<section>
-  <h2>門診狀態</h2>
-  <ul>
-    <li>目前看診號碼：{% if current_number %}{{ current_number }}{% else %}尚未叫號{% endif %}</li>
-    <li>已報到人數：{{ checked_in_count }}</li>
-    <li>等待人數：{{ waiting_count }}</li>
-    <li>已完成：{{ completed_count }}</li>
-  </ul>
-</section>
-<section>
+<div class="card-grid">
+  <section class="card">
+    <h2>您的掛號</h2>
+    <ul>
+      <li>日期：{{ schedule.date }} {{ schedule.get_session_display }}</li>
+      <li>科別：{{ schedule.doctor.department.name }}</li>
+      <li>醫師：{{ schedule.doctor.user.display_name }}</li>
+      <li>您的號碼：{{ appointment.queue_number }}</li>
+      <li>目前狀態：
+        {% if appointment.status == 'reserved' %}
+          <span class="badge badge-warning">{{ appointment.get_status_display }}</span>
+        {% elif appointment.status == 'checked_in' %}
+          <span class="badge badge-success">{{ appointment.get_status_display }}</span>
+        {% elif appointment.status == 'in_progress' %}
+          <span class="badge">{{ appointment.get_status_display }}</span>
+        {% elif appointment.status == 'completed' %}
+          <span class="badge badge-success">{{ appointment.get_status_display }}</span>
+        {% elif appointment.status == 'cancelled' %}
+          <span class="badge badge-muted">{{ appointment.get_status_display }}</span>
+        {% else %}
+          <span class="badge badge-muted">{{ appointment.get_status_display }}</span>
+        {% endif %}
+      </li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>門診狀態</h2>
+    <ul>
+      <li>目前看診號碼：{% if current_number %}{{ current_number }}{% else %}尚未叫號{% endif %}</li>
+      <li>已報到人數：{{ checked_in_count }}</li>
+      <li>等待人數：{{ waiting_count }}</li>
+      <li>已完成：{{ completed_count }}</li>
+    </ul>
+  </section>
+</div>
+
+<section class="card">
   <h2>最新事件</h2>
   <ul>
     {% for event in events %}
@@ -36,5 +54,8 @@
     {% endfor %}
   </ul>
 </section>
-<p><a href="{% url 'patients:appointments' %}">返回掛號紀錄</a></p>
+
+<div class="button-set page-actions">
+  <a href="{% url 'patients:appointments' %}" role="button" class="secondary btn-compact">返回掛號紀錄</a>
+</div>
 {% endblock %}

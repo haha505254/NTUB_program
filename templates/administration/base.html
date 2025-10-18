@@ -1,12 +1,18 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{% block admin_page_title %}管理後台{% endblock %}{% endblock %}
 
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'styles/admin.css' %}" />
+{% endblock %}
+
 {% block content %}
-<div class="grid" style="grid-template-columns: 220px 1fr; gap: 1.5rem;">
+<div class="admin-shell">
   <aside>
     <nav aria-label="管理後台選單">
-      <ul style="list-style: none; padding-left: 0;">
+      <ul>
         {% with section=active_section|default:request.resolver_match.url_name %}
           <li>
             <a href="{% url 'administration:dashboard' %}" {% if section == 'dashboard' %}class="contrast"{% endif %}>

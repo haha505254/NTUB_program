@@ -34,7 +34,7 @@
       {% endif %}
     </div>
   {% endfor %}
-  <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.5rem;">
+  <div class="form-actions">
     <button type="submit">{% if is_edit %}儲存變更{% else %}建立醫師{% endif %}</button>
     <a href="{% url 'administration:doctors' %}" role="button" class="secondary">返回列表</a>
   </div>

@@ -4,6 +4,7 @@
 
 {% block content %}
 <h1>掛號紀錄</h1>
+<p class="help-text">掌握即將到來與歷史掛號，可隨時查看看診進度或取消預約。</p>
 <table>
   <thead>
     <tr>
@@ -28,15 +29,31 @@
           {% endif %}
         </td>
         <td>{{ appointment.queue_number }}</td>
-        <td>{{ appointment.get_status_display }}</td>
         <td>
-          <a href="{% url 'patients:appointment-progress' appointment.pk %}" role="button">看診進度</a>
+          {% if appointment.status == 'reserved' %}
+            <span class="badge badge-warning">{{ appointment.get_status_display }}</span>
+          {% elif appointment.status == 'checked_in' %}
+            <span class="badge badge-success">{{ appointment.get_status_display }}</span>
+          {% elif appointment.status == 'in_progress' %}
+            <span class="badge">{{ appointment.get_status_display }}</span>
+          {% elif appointment.status == 'completed' %}
+            <span class="badge badge-success">{{ appointment.get_status_display }}</span>
+          {% elif appointment.status == 'cancelled' %}
+            <span class="badge badge-muted">{{ appointment.get_status_display }}</span>
+          {% else %}
+            <span class="badge badge-muted">{{ appointment.get_status_display }}</span>
+          {% endif %}
+        </td>
+        <td class="actions">
+          <div class="button-set">
+            <a href="{% url 'patients:appointment-progress' appointment.pk %}" role="button" class="btn-compact">看診進度</a>
           {% if appointment.status == 'reserved' %}
             <form method="post" action="{% url 'patients:appointment-cancel' appointment.pk %}">
               {% csrf_token %}
-              <button type="submit" class="secondary">取消</button>
+              <button type="submit" class="secondary btn-compact">取消</button>
             </form>
           {% endif %}
+          </div>
         </td>
       </tr>
     {% empty %}

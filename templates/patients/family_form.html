@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>{% if form.instance.pk %}編輯家屬{% else %}新增家屬{% endif %}</h1>
-<form method="post">
+<form method="post" class="stack">
   {% csrf_token %}
   <div class="grid">
     <label>
@@ -39,7 +39,9 @@
     </label>
   </div>
   {% for error in form.non_field_errors %}<small class="error">{{ error }}</small>{% endfor %}
-  <button type="submit">儲存</button>
-  <a href="{% url 'patients:family' %}" role="button" class="secondary">取消</a>
+  <div class="form-actions">
+    <button type="submit">儲存</button>
+    <a href="{% url 'patients:family' %}" role="button" class="secondary">取消</a>
+  </div>
 </form>
 {% endblock %}

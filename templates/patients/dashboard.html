@@ -4,24 +4,43 @@
 
 {% block content %}
 <h1>病患儀表板</h1>
-<p>在這裡可以快速進行預約掛號、查看看診進度與管理家屬資訊。</p>
-<ul>
-  <li><a href="{% url 'patients:schedule-search' %}">查詢門診班表與預約</a></li>
-  <li><a href="{% url 'patients:appointments' %}">掛號紀錄</a></li>
-  <li><a href="{% url 'patients:family' %}">家屬管理{% if family_count is not None %}（{{ family_count }}）{% endif %}</a></li>
-  <li><a href="{% url 'accounts:switch' %}">切換其他角色</a></li>
-</ul>
+<p class="help-text">快速預約門診、掌握看診進度並維護家屬資料。</p>
+
+<div class="card-grid">
+  <article class="card">
+    <h2>查詢門診班表</h2>
+    <p>依日期與科別挑選醫師，立即預約門診。</p>
+    <a href="{% url 'patients:schedule-search' %}" role="button" class="btn-compact">立即查詢</a>
+  </article>
+  <article class="card">
+    <h2>掛號紀錄</h2>
+    <p>查看歷史掛號、取消預約與追蹤看診狀態。</p>
+    <a href="{% url 'patients:appointments' %}" role="button" class="btn-compact">管理掛號</a>
+  </article>
+  <article class="card">
+    <h2>家屬管理</h2>
+    <p>維護家屬資料以代辦預約{% if family_count is not None %}（目前 {{ family_count }} 人）{% endif %}。</p>
+    <a href="{% url 'patients:family' %}" role="button" class="btn-compact">開啟家屬名單</a>
+  </article>
+  <article class="card">
+    <h2>切換角色</h2>
+    <p>若同時擁有其他角色，可快速切換至對應儀表板。</p>
+    <a href="{% url 'accounts:switch' %}" role="button" class="btn-compact">切換角色</a>
+  </article>
+</div>
 
 {% if upcoming_appointments %}
-  <h2>即將到來的掛號</h2>
-  <ul>
-    {% for item in upcoming_appointments %}
-      <li>
-        {{ item.schedule.date }} {{ item.schedule.get_session_display }} -
-        {{ item.schedule.doctor.user.display_name }}（{{ item.schedule.doctor.department.name }}）
-        ，號碼 {{ item.queue_number }}
-      </li>
-    {% endfor %}
-  </ul>
+  <section class="card upcoming-list">
+    <h2>即將到來的掛號</h2>
+    <ul>
+      {% for item in upcoming_appointments %}
+        <li>
+          <strong>{{ item.schedule.date|date:"Y-m-d" }} {{ item.schedule.get_session_display }}</strong>
+          ・ {{ item.schedule.doctor.department.name }} ／ {{ item.schedule.doctor.user.display_name }}
+          ・ 號碼 {{ item.queue_number }}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
 {% endif %}
 {% endblock %}

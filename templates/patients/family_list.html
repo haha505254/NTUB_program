@@ -4,10 +4,10 @@
 
 {% block content %}
 <h1>家屬管理</h1>
-<p>
-  <a href="{% url 'patients:family-add' %}" role="button">新增家屬</a>
-  <a href="{% url 'patients:dashboard' %}" role="button" class="secondary">返回儀表板</a>
-</p>
+<div class="button-set page-actions">
+  <a href="{% url 'patients:family-add' %}" role="button" class="btn-compact">新增家屬</a>
+  <a href="{% url 'patients:dashboard' %}" role="button" class="secondary btn-compact">返回儀表板</a>
+</div>
 <table>
   <thead>
     <tr>
@@ -27,12 +27,14 @@
         <td>{{ member.national_id|default:"-" }}</td>
         <td>{{ member.birth_date|default:"-" }}</td>
         <td>{{ member.phone|default:"-" }}</td>
-        <td>
-          <a href="{% url 'patients:family-edit' member.pk %}" role="button" class="secondary">編輯</a>
-          <form method="post" action="{% url 'patients:family-delete' member.pk %}" style="display:inline">
-            {% csrf_token %}
-            <button type="submit" class="secondary" onclick="return confirm('確定刪除？');">刪除</button>
-          </form>
+        <td class="actions">
+          <div class="button-set">
+            <a href="{% url 'patients:family-edit' member.pk %}" role="button" class="secondary btn-compact">編輯</a>
+            <form method="post" action="{% url 'patients:family-delete' member.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="secondary btn-compact" onclick="return confirm('確定刪除？');">刪除</button>
+            </form>
+          </div>
         </td>
       </tr>
     {% empty %}

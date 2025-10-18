@@ -3,18 +3,26 @@
 {% block admin_page_title %}班表管理{% endblock %}
 
 {% block admin_content %}
-<h1>班表管理</h1>
-
-<form method="get" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; align-items: end;">
+<div class="page-header">
   <div>
+    <h1>班表管理</h1>
+    <p class="help-text">依日期、科別與狀態篩選班表，掌握掛號負載與診間安排。</p>
+  </div>
+  <div class="actions">
+    <a href="{% url 'administration:schedules-add' %}" role="button" class="btn-compact">新增班表</a>
+  </div>
+</div>
+
+<form method="get" class="filter-bar">
+  <div class="field">
     <label for="schedule-start">開始日期</label>
     <input type="date" id="schedule-start" name="start" value="{{ start_filter }}">
   </div>
-  <div>
+  <div class="field">
     <label for="schedule-end">結束日期</label>
     <input type="date" id="schedule-end" name="end" value="{{ end_filter }}">
   </div>
-  <div>
+  <div class="field">
     <label for="schedule-department">科別</label>
     <select id="schedule-department" name="department">
       <option value="">全部科別</option>
@@ -25,7 +33,7 @@
       {% endfor %}
     </select>
   </div>
-  <div>
+  <div class="field">
     <label for="schedule-doctor">醫師</label>
     <select id="schedule-doctor" name="doctor">
       <option value="">全部醫師</option>
@@ -36,7 +44,7 @@
       {% endfor %}
     </select>
   </div>
-  <div>
+  <div class="field">
     <label for="schedule-status">狀態</label>
     <select id="schedule-status" name="status">
       <option value="all" {% if status_filter == "all" %}selected{% endif %}>全部</option>
@@ -45,11 +53,9 @@
       {% endfor %}
     </select>
   </div>
-  <div style="display: flex; gap: 0.5rem;">
-    <button type="submit" class="secondary">套用條件</button>
-    <a href="{% url 'administration:schedules' %}" role="button" class="secondary">清除</a>
-    <span style="flex-grow: 1;"></span>
-    <a href="{% url 'administration:schedules-add' %}" role="button">新增班表</a>
+  <div class="field-actions">
+    <button type="submit" class="secondary btn-compact">套用條件</button>
+    <a href="{% url 'administration:schedules' %}" role="button" class="secondary btn-compact">清除</a>
   </div>
 </form>
 
@@ -77,18 +83,18 @@
         </td>
         <td>
           {% if schedule.status == 'open' %}
-            <span class="contrast" style="padding: 0.2rem 0.4rem; border-radius: 0.25rem;">可掛號</span>
+            <span class="badge badge-success">可掛號</span>
           {% elif schedule.status == 'closed' %}
-            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">額滿</span>
+            <span class="badge badge-danger">額滿</span>
           {% elif schedule.status == 'paused' %}
-            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">暫停</span>
+            <span class="badge badge-warning">暫停</span>
           {% else %}
-            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">已結束</span>
+            <span class="badge badge-muted">已結束</span>
           {% endif %}
         </td>
-        <td>
-          <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.4rem;">
-            <a href="{% url 'administration:schedules-edit' schedule.pk %}" class="secondary" role="button">編輯</a>
+        <td class="actions">
+          <div class="button-set">
+            <a href="{% url 'administration:schedules-edit' schedule.pk %}" class="secondary btn-compact" role="button">編輯</a>
             <form method="post" action="{% url 'administration:schedules-status' schedule.pk %}">
               {% csrf_token %}
               <select name="status" aria-label="更新班表狀態">
@@ -96,11 +102,11 @@
                   <option value="{{ value }}" {% if schedule.status == value %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
               </select>
-              <button type="submit" class="secondary">更新狀態</button>
+              <button type="submit" class="secondary btn-compact">更新狀態</button>
             </form>
             <form method="post" action="{% url 'administration:schedules-delete' schedule.pk %}">
               {% csrf_token %}
-              <button type="submit" class="secondary" onclick="return confirm('確認要刪除此班表？');">刪除</button>
+              <button type="submit" class="secondary btn-compact" onclick="return confirm('確認要刪除此班表？');">刪除</button>
             </form>
           </div>
         </td>

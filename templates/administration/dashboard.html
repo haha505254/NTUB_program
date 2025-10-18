@@ -4,33 +4,33 @@
 
 {% block admin_content %}
 <h1>管理後台總覽</h1>
-<p>快速掌握醫師、班表、科別與公告狀態，並導向各項維運功能。</p>
+<p class="help-text">快速掌握醫師、班表、科別與公告狀態，並導向各項維運功能。</p>
 
-<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
-  <article>
+<div class="stat-grid">
+  <article class="stat-card">
     <h2>醫師管理</h2>
     <p>維護醫師基本資料、帳號與啟用狀態。</p>
-    <a href="{% url 'administration:doctors' %}" role="button">前往醫師管理</a>
+    <a href="{% url 'administration:doctors' %}" role="button" class="btn-compact">前往醫師管理</a>
   </article>
-  <article>
+  <article class="stat-card">
     <h2>班表管理</h2>
     <p>建立與調整門診班表，設定診間、限額與狀態。</p>
-    <a href="{% url 'administration:schedules' %}" role="button">前往班表管理</a>
+    <a href="{% url 'administration:schedules' %}" role="button" class="btn-compact">前往班表管理</a>
   </article>
-  <article>
+  <article class="stat-card">
     <h2>科別管理</h2>
     <p>維護科別代碼、名稱與啟用狀態。</p>
-    <a href="{% url 'administration:departments' %}" role="button">前往科別管理</a>
+    <a href="{% url 'administration:departments' %}" role="button" class="btn-compact">前往科別管理</a>
   </article>
-  <article>
+  <article class="stat-card">
     <h2>掛號統計</h2>
     <p>依日期、科別、醫師檢視掛號/報到/完成等指標。</p>
-    <a href="{% url 'administration:reports' %}" role="button">檢視統計報表</a>
+    <a href="{% url 'administration:reports' %}" role="button" class="btn-compact">檢視統計報表</a>
   </article>
-  <article>
+  <article class="stat-card">
     <h2>公告管理</h2>
     <p>發佈或下架系統公告，控制顯示範圍與期間。</p>
-    <a href="{% url 'administration:announcements' %}" role="button">管理公告</a>
+    <a href="{% url 'administration:announcements' %}" role="button" class="btn-compact">管理公告</a>
   </article>
 </div>
 {% endblock %}
