@@ -47,7 +47,11 @@ class FamilyMemberListView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         patient = self.request.user.patient_profile
-        context["family_members"] = patient.family_members.all().order_by("full_name")
+        members = list(patient.family_members.all().order_by("full_name"))
+        context["family_members"] = members
+        context["has_incomplete_family"] = any(
+            not member.national_id or not member.birth_date or not member.phone for member in members
+        )
         context["form"] = FamilyMemberForm(patient=patient)
         return context
 

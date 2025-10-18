@@ -4,6 +4,7 @@
 
 {% block content %}
 <h1>{% if form.instance.pk %}編輯家屬{% else %}新增家屬{% endif %}</h1>
+<p class="help-text">家屬掛號時，需提供完整的身分證/護照號碼、生日與聯絡電話。</p>
 <form method="post" class="stack">
   {% csrf_token %}
   <div class="grid">
@@ -11,31 +12,37 @@
       {{ form.full_name.label_tag }}
       {{ form.full_name }}
       {% for error in form.full_name.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      {% if form.full_name.help_text %}<small class="help-text">{{ form.full_name.help_text }}</small>{% endif %}
     </label>
     <label>
       {{ form.relationship.label_tag }}
       {{ form.relationship }}
       {% for error in form.relationship.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      {% if form.relationship.help_text %}<small class="help-text">{{ form.relationship.help_text }}</small>{% endif %}
     </label>
     <label>
       {{ form.national_id.label_tag }}
       {{ form.national_id }}
       {% for error in form.national_id.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      {% if form.national_id.help_text %}<small class="help-text">{{ form.national_id.help_text }}</small>{% endif %}
     </label>
     <label>
       {{ form.birth_date.label_tag }}
       {{ form.birth_date }}
       {% for error in form.birth_date.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      {% if form.birth_date.help_text %}<small class="help-text">{{ form.birth_date.help_text }}</small>{% endif %}
     </label>
     <label>
       {{ form.phone.label_tag }}
       {{ form.phone }}
       {% for error in form.phone.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      {% if form.phone.help_text %}<small class="help-text">{{ form.phone.help_text }}</small>{% endif %}
     </label>
     <label>
       {{ form.notes.label_tag }}
       {{ form.notes }}
       {% for error in form.notes.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      {% if form.notes.help_text %}<small class="help-text">{{ form.notes.help_text }}</small>{% endif %}
     </label>
   </div>
   {% for error in form.non_field_errors %}<small class="error">{{ error }}</small>{% endfor %}

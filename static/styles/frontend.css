@@ -101,6 +101,53 @@ main p {
   color: var(--app-heading);
 }
 
+.doctor-schedule-table tr.is-selected {
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.doctor-schedule-table tr.is-selected a {
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.doctor-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.doctor-panels .panel {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.doctor-panels .panel h3 {
+  margin-top: 0;
+}
+
+.doctor-meta {
+  margin-bottom: 1rem;
+}
+
+.error-page {
+  text-align: center;
+  padding: 2.5rem 2.8rem;
+}
+
+.error-page h1 {
+  font-size: clamp(1.8rem, 1.5rem + 1vw, 2.2rem);
+  margin-bottom: 1rem;
+}
+
+.error-page .error-actions {
+  margin-top: 1.5rem;
+  display: inline-flex;
+  gap: 0.75rem;
+}
+
 main table {
   width: 100%;
   border-collapse: separate;
@@ -219,6 +266,44 @@ main tbody tr:hover {
 
 .filter-bar .spacer {
   flex: 1 1 auto;
+}
+
+.filter-bar .help-inline {
+  margin: 0;
+}
+
+.tab-bar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  padding: 0.2rem;
+  margin: 1rem 0 1.5rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+.tab-bar .tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1.1rem;
+  border-radius: calc(var(--app-radius) - 4px);
+  color: var(--app-muted);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.tab-bar .tab:hover {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.tab-bar .tab.active {
+  background: rgba(37, 99, 235, 0.2);
+  color: #1d4ed8;
+  font-weight: 600;
 }
 
 .form-actions {

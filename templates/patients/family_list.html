@@ -8,6 +8,9 @@
   <a href="{% url 'patients:family-add' %}" role="button" class="btn-compact">新增家屬</a>
   <a href="{% url 'patients:dashboard' %}" role="button" class="secondary btn-compact">返回儀表板</a>
 </div>
+{% if has_incomplete_family %}
+  <p class="help-text">⚠️ 有家屬資料尚未填寫完整，掛號前請點「編輯」補齊身分證/護照、生日與聯絡電話。</p>
+{% endif %}
 <table>
   <thead>
     <tr>
@@ -24,9 +27,24 @@
       <tr>
         <td>{{ member.full_name }}</td>
         <td>{{ member.relationship }}</td>
-        <td>{{ member.national_id|default:"-" }}</td>
-        <td>{{ member.birth_date|default:"-" }}</td>
-        <td>{{ member.phone|default:"-" }}</td>
+        <td>
+          {{ member.national_id|default:"-" }}
+          {% if not member.national_id %}
+            <span class="badge badge-danger">需補齊</span>
+          {% endif %}
+        </td>
+        <td>
+          {{ member.birth_date|date:"Y-m-d"|default:"-" }}
+          {% if not member.birth_date %}
+            <span class="badge badge-danger">需補齊</span>
+          {% endif %}
+        </td>
+        <td>
+          {{ member.phone|default:"-" }}
+          {% if not member.phone %}
+            <span class="badge badge-danger">需補齊</span>
+          {% endif %}
+        </td>
         <td class="actions">
           <div class="button-set">
             <a href="{% url 'patients:family-edit' member.pk %}" role="button" class="secondary btn-compact">編輯</a>

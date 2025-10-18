@@ -43,6 +43,20 @@ class AppointmentBookingForm(forms.Form):
             status=Appointment.Status.CANCELLED
         ).exists():
             raise forms.ValidationError("您已經預約該時段，無需重複預約。")
+        family_member = cleaned.get("family_member")
+        if family_member:
+            missing = []
+            if not family_member.national_id:
+                missing.append("身分證/護照")
+            if not family_member.birth_date:
+                missing.append("生日")
+            if not family_member.phone:
+                missing.append("聯絡電話")
+            if missing:
+                items = "、".join(missing)
+                raise forms.ValidationError(
+                    f"家屬「{family_member.full_name}」尚未填寫 {items}，請先到「家屬管理」補齊資料後再預約。"
+                )
         return cleaned
 
     def save(self) -> Appointment:
@@ -237,6 +251,20 @@ class OnsiteAppointmentForm(forms.Form):
             status=Appointment.Status.CANCELLED
         ).exists():
             raise forms.ValidationError("此病患已經掛此時段。")
+        family_member = cleaned.get("family_member")
+        if family_member:
+            missing = []
+            if not family_member.national_id:
+                missing.append("身分證/護照")
+            if not family_member.birth_date:
+                missing.append("生日")
+            if not family_member.phone:
+                missing.append("聯絡電話")
+            if missing:
+                items = "、".join(missing)
+                raise forms.ValidationError(
+                    f"家屬「{family_member.full_name}」缺少 {items}，請先補齊後再辦理掛號。"
+                )
         return cleaned
 
     def save(self) -> Appointment:

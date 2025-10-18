@@ -8,7 +8,7 @@ from .models import FamilyMember, Patient
 class FamilyMemberForm(forms.ModelForm):
     birth_date = forms.DateField(
         label="生日",
-        required=False,
+        required=True,
         widget=forms.DateInput(attrs={"type": "date"}),
     )
 
@@ -29,6 +29,22 @@ class FamilyMemberForm(forms.ModelForm):
     def __init__(self, *args, patient: Patient, **kwargs):
         super().__init__(*args, **kwargs)
         self.patient = patient
+        self.fields["national_id"].required = True
+        self.fields["phone"].required = True
+        self.fields["national_id"].help_text = "請輸入身分證或護照號碼。"
+        self.fields["phone"].help_text = "請提供聯絡電話，供診間聯繫。"
+
+    def clean_national_id(self):
+        national_id = self.cleaned_data["national_id"].strip().upper()
+        if not national_id:
+            raise forms.ValidationError("請輸入家屬的身分證或護照號碼。")
+        return national_id
+
+    def clean_phone(self):
+        phone = self.cleaned_data["phone"].strip()
+        if not phone:
+            raise forms.ValidationError("請輸入家屬的聯絡電話。")
+        return phone
 
     def save(self, commit: bool = True):
         member = super().save(commit=False)
