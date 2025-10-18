@@ -1,0 +1,86 @@
+{% extends "administration/base.html" %}
+
+{% block admin_page_title %}醫師管理{% endblock %}
+
+{% block admin_content %}
+<h1>醫師管理</h1>
+
+<form method="get" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; align-items: end;">
+  <div>
+    <label for="doctor-search">搜尋關鍵字</label>
+    <input type="search" id="doctor-search" name="q" placeholder="姓名、帳號或證書號" value="{{ search_query }}">
+  </div>
+  <div>
+    <label for="doctor-department">科別</label>
+    <select id="doctor-department" name="department">
+      <option value="">全部科別</option>
+      {% for department in departments %}
+        <option value="{{ department.pk }}" {% if department_filter|stringformat:"s" == department.pk|stringformat:"s" %}selected{% endif %}>
+          {{ department.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="doctor-status">狀態</label>
+    <select id="doctor-status" name="status">
+      <option value="all" {% if status_filter == "all" %}selected{% endif %}>全部</option>
+      <option value="active" {% if status_filter == "active" %}selected{% endif %}>啟用</option>
+      <option value="inactive" {% if status_filter == "inactive" %}selected{% endif %}>停用</option>
+    </select>
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    <button type="submit" class="secondary">套用條件</button>
+    <a href="{% url 'administration:doctors' %}" role="button" class="secondary">清除</a>
+    <span style="flex-grow: 1;"></span>
+    <a href="{% url 'administration:doctors-add' %}" role="button">新增醫師</a>
+  </div>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>姓名</th>
+      <th>帳號</th>
+      <th>科別</th>
+      <th>證書號</th>
+      <th>狀態</th>
+      <th>最後更新</th>
+      <th style="width: 220px;">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for doctor in doctors %}
+      <tr>
+        <td>{{ doctor.user.display_name }}</td>
+        <td>{{ doctor.user.username }}</td>
+        <td>{{ doctor.department.name }}</td>
+        <td>{{ doctor.license_number }}</td>
+        <td>
+          {% if doctor.is_active %}
+            <span class="contrast" style="padding: 0.2rem 0.4rem; border-radius: 0.25rem;">啟用</span>
+          {% else %}
+            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">停用</span>
+          {% endif %}
+        </td>
+        <td>{{ doctor.updated_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          <a href="{% url 'administration:doctors-edit' doctor.pk %}" class="secondary" role="button" style="margin-bottom: 0.25rem;">編輯</a>
+          <form method="post" action="{% url 'administration:doctors-toggle' doctor.pk %}" style="display: inline;">
+            {% csrf_token %}
+            {% if doctor.is_active %}
+              <button type="submit" class="secondary">停用</button>
+            {% else %}
+              <button type="submit">啟用</button>
+            {% endif %}
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="7">尚未建立醫師資料。</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

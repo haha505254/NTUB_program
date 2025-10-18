@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{% block admin_page_title %}管理後台{% endblock %}{% endblock %}
+
+{% block content %}
+<div class="grid" style="grid-template-columns: 220px 1fr; gap: 1.5rem;">
+  <aside>
+    <nav aria-label="管理後台選單">
+      <ul style="list-style: none; padding-left: 0;">
+        {% with section=active_section|default:request.resolver_match.url_name %}
+          <li>
+            <a href="{% url 'administration:dashboard' %}" {% if section == 'dashboard' %}class="contrast"{% endif %}>
+              總覽
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'administration:doctors' %}" {% if section == 'doctors' %}class="contrast"{% endif %}>
+              醫師管理
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'administration:schedules' %}" {% if section == 'schedules' %}class="contrast"{% endif %}>
+              班表管理
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'administration:departments' %}" {% if section == 'departments' %}class="contrast"{% endif %}>
+              科別管理
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'administration:reports' %}" {% if section == 'reports' %}class="contrast"{% endif %}>
+              掛號統計
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'administration:announcements' %}" {% if section == 'announcements' %}class="contrast"{% endif %}>
+              公告管理
+            </a>
+          </li>
+        {% endwith %}
+      </ul>
+    </nav>
+  </aside>
+  <section>
+    {% block admin_content %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

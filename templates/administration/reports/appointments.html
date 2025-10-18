@@ -1,0 +1,147 @@
+{% extends "administration/base.html" %}
+
+{% block admin_page_title %}掛號統計報表{% endblock %}
+
+{% block admin_content %}
+<h1>掛號統計報表</h1>
+<p class="help-text">可依日期區間、科別與醫師統計掛號狀態，並下載 CSV 匯出。</p>
+
+<form method="get" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; align-items: end;">
+  <div>
+    {{ form.start_date.label_tag }}
+    {{ form.start_date }}
+  </div>
+  <div>
+    {{ form.end_date.label_tag }}
+    {{ form.end_date }}
+  </div>
+  <div>
+    {{ form.department.label_tag }}
+    {{ form.department }}
+  </div>
+  <div>
+    {{ form.doctor.label_tag }}
+    {{ form.doctor }}
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    <button type="submit" class="secondary">產生報表</button>
+    <a href="{% url 'administration:reports' %}" role="button" class="secondary">清除條件</a>
+    {% if has_result %}
+      <span style="flex-grow: 1;"></span>
+      <a href="?{{ query_string }}{% if query_string %}&{% endif %}download=csv" role="button">下載 CSV</a>
+    {% endif %}
+  </div>
+</form>
+
+{% if form.errors %}
+  <ul class="error">
+    {% for field, errors in form.errors.items %}
+      {% for error in errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if has_result %}
+  <section class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+    <article>
+      <h2>總計</h2>
+      <p style="font-size: 1.8rem; margin: 0;">{{ totals.total }}</p>
+      <p class="help-text">符合條件的掛號總筆數</p>
+    </article>
+    <article>
+      <h2>已預約</h2>
+      <p style="font-size: 1.4rem; margin: 0;">{{ totals.reserved }}</p>
+    </article>
+    <article>
+      <h2>已報到</h2>
+      <p style="font-size: 1.4rem; margin: 0;">{{ totals.checked_in }}</p>
+    </article>
+    <article>
+      <h2>看診中</h2>
+      <p style="font-size: 1.4rem; margin: 0;">{{ totals.in_progress }}</p>
+    </article>
+    <article>
+      <h2>已完成</h2>
+      <p style="font-size: 1.4rem; margin: 0;">{{ totals.completed }}</p>
+    </article>
+    <article>
+      <h2>已取消</h2>
+      <p style="font-size: 1.4rem; margin: 0;">{{ totals.cancelled }}</p>
+    </article>
+  </section>
+
+  <section>
+    <h2>依醫師統計</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>科別</th>
+          <th>醫師</th>
+          <th>總計</th>
+          <th>已預約</th>
+          <th>已報到</th>
+          <th>看診中</th>
+          <th>已完成</th>
+          <th>已取消</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in doctor_rows %}
+          <tr>
+            <td>{{ row.schedule__doctor__department__name }}</td>
+            <td>{{ row.schedule__doctor__user__last_name }}{{ row.schedule__doctor__user__first_name }}</td>
+            <td>{{ row.total }}</td>
+            <td>{{ row.reserved }}</td>
+            <td>{{ row.checked_in }}</td>
+            <td>{{ row.in_progress }}</td>
+            <td>{{ row.completed }}</td>
+            <td>{{ row.cancelled }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8">沒有符合條件的醫師資料。</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>每日統計</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>日期</th>
+          <th>總計</th>
+          <th>已預約</th>
+          <th>已報到</th>
+          <th>看診中</th>
+          <th>已完成</th>
+          <th>已取消</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in daily_rows %}
+          <tr>
+            <td>{{ row.schedule__date|date:"Y-m-d" }}</td>
+            <td>{{ row.total }}</td>
+            <td>{{ row.reserved }}</td>
+            <td>{{ row.checked_in }}</td>
+            <td>{{ row.in_progress }}</td>
+            <td>{{ row.completed }}</td>
+            <td>{{ row.cancelled }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7">沒有符合條件的掛號資料。</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% else %}
+  <p style="margin-top: 1rem;">請先設定查詢條件後產生報表。</p>
+{% endif %}
+{% endblock %}

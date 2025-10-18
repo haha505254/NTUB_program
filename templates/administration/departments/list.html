@@ -1,0 +1,61 @@
+{% extends "administration/base.html" %}
+
+{% block admin_page_title %}科別管理{% endblock %}
+
+{% block admin_content %}
+<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: end;">
+  <h1 style="grid-column: 1 / -1; margin-bottom: 0;">科別管理</h1>
+  <form method="get" class="grid" style="grid-template-columns: 1fr auto; gap: 0.5rem;">
+    <input type="search" id="q" name="q" placeholder="搜尋名稱或代碼" value="{{ search_query }}" aria-label="搜尋科別">
+    <button type="submit" class="secondary">搜尋</button>
+  </form>
+  <div style="text-align: right;">
+    <a href="{% url 'administration:departments-add' %}" role="button">新增科別</a>
+  </div>
+</div>
+
+<p class="help-text">停用的科別不會出現在掛號查詢與班表設定中。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>代碼</th>
+      <th>名稱</th>
+      <th>狀態</th>
+      <th>最後更新時間</th>
+      <th style="width: 180px;">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for department in departments %}
+      <tr>
+        <td>{{ department.code }}</td>
+        <td>{{ department.name }}</td>
+        <td>
+          {% if department.is_active %}
+            <span class="contrast" style="padding: 0.2rem 0.4rem; border-radius: 0.25rem;">啟用</span>
+          {% else %}
+            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">停用</span>
+          {% endif %}
+        </td>
+        <td>{{ department.updated_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          <a href="{% url 'administration:departments-edit' department.pk %}" class="secondary" role="button" style="margin-bottom: 0.25rem;">編輯</a>
+          <form method="post" action="{% url 'administration:departments-toggle' department.pk %}" style="display: inline;">
+            {% csrf_token %}
+            {% if department.is_active %}
+              <button type="submit" class="secondary">停用</button>
+            {% else %}
+              <button type="submit">啟用</button>
+            {% endif %}
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="5">尚未建立任何科別。</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

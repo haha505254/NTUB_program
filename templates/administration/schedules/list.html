@@ -1,0 +1,129 @@
+{% extends "administration/base.html" %}
+
+{% block admin_page_title %}班表管理{% endblock %}
+
+{% block admin_content %}
+<h1>班表管理</h1>
+
+<form method="get" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; align-items: end;">
+  <div>
+    <label for="schedule-start">開始日期</label>
+    <input type="date" id="schedule-start" name="start" value="{{ start_filter }}">
+  </div>
+  <div>
+    <label for="schedule-end">結束日期</label>
+    <input type="date" id="schedule-end" name="end" value="{{ end_filter }}">
+  </div>
+  <div>
+    <label for="schedule-department">科別</label>
+    <select id="schedule-department" name="department">
+      <option value="">全部科別</option>
+      {% for department in departments %}
+        <option value="{{ department.pk }}" {% if department_filter|stringformat:"s" == department.pk|stringformat:"s" %}selected{% endif %}>
+          {{ department.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="schedule-doctor">醫師</label>
+    <select id="schedule-doctor" name="doctor">
+      <option value="">全部醫師</option>
+      {% for doctor in doctors %}
+        <option value="{{ doctor.pk }}" {% if doctor_filter|stringformat:"s" == doctor.pk|stringformat:"s" %}selected{% endif %}>
+          {{ doctor.department.name }} - {{ doctor.user.display_name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="schedule-status">狀態</label>
+    <select id="schedule-status" name="status">
+      <option value="all" {% if status_filter == "all" %}selected{% endif %}>全部</option>
+      {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    <button type="submit" class="secondary">套用條件</button>
+    <a href="{% url 'administration:schedules' %}" role="button" class="secondary">清除</a>
+    <span style="flex-grow: 1;"></span>
+    <a href="{% url 'administration:schedules-add' %}" role="button">新增班表</a>
+  </div>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>日期</th>
+      <th>時段</th>
+      <th>醫師</th>
+      <th>診間</th>
+      <th>名額</th>
+      <th>狀態</th>
+      <th style="width: 240px;">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for schedule in schedules %}
+      <tr>
+        <td>{{ schedule.date|date:"Y-m-d" }}</td>
+        <td>{{ schedule.get_session_display }}</td>
+        <td>{{ schedule.doctor.department.name }}／{{ schedule.doctor.user.display_name }}</td>
+        <td>{{ schedule.clinic_room|default:"-" }}</td>
+        <td>
+          {{ schedule.active_appointments_count }}/{{ schedule.quota }}
+        </td>
+        <td>
+          {% if schedule.status == 'open' %}
+            <span class="contrast" style="padding: 0.2rem 0.4rem; border-radius: 0.25rem;">可掛號</span>
+          {% elif schedule.status == 'closed' %}
+            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">額滿</span>
+          {% elif schedule.status == 'paused' %}
+            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">暫停</span>
+          {% else %}
+            <span style="padding: 0.2rem 0.4rem; border-radius: 0.25rem; background: var(--muted-border-color); color: var(--muted-color);">已結束</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.4rem;">
+            <a href="{% url 'administration:schedules-edit' schedule.pk %}" class="secondary" role="button">編輯</a>
+            <form method="post" action="{% url 'administration:schedules-status' schedule.pk %}">
+              {% csrf_token %}
+              <select name="status" aria-label="更新班表狀態">
+                {% for value, label in status_choices %}
+                  <option value="{{ value }}" {% if schedule.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="secondary">更新狀態</button>
+            </form>
+            <form method="post" action="{% url 'administration:schedules-delete' schedule.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="secondary" onclick="return confirm('確認要刪除此班表？');">刪除</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="7">查無符合條件的班表。</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+  <nav>
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li><a href="?{{ query_string }}{% if query_string %}&{% endif %}page={{ page_obj.previous_page_number }}">上一頁</a></li>
+      {% endif %}
+      <li>第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 頁</li>
+      {% if page_obj.has_next %}
+        <li><a href="?{{ query_string }}{% if query_string %}&{% endif %}page={{ page_obj.next_page_number }}">下一頁</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+{% endblock %}

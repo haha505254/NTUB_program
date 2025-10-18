@@ -1,0 +1,8 @@
+{% extends "administration/base.html" %}
+
+{% block admin_page_title %}功能開發中{% endblock %}
+
+{% block admin_content %}
+<h1>{{ page_title|default:"功能開發中" }}</h1>
+<p>{{ page_description|default:"此功能正在建置中，近期會更新完成。" }}</p>
+{% endblock %}
