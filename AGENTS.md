@@ -35,7 +35,7 @@
 - Gunicorn 參數由 `GUNICORN_CMD_ARGS` 控制，正式環境請在 `.env.docker` 設定適當 worker 與 timeout。
 - 更新 `.env` 前務必檢查敏感資訊，避免進入版控。部署至 EC2 時，先以 `scp` 上傳 `db.sqlite3` 再用 `sudo mv` 替換，可保留正確權限。
 - EC2/Container 相關操作請參考 `docs/aws-ec2-operations.md` 與 `docs/docker-sqlite-deployment-guide.md`，確保 IP、Gunicorn worker、資料庫同步流程一致。
-- **若調整任何環境參數、帳號密碼或部署流程，務必同步檢查 `docs/` 內相關文章（例如 `aws-ec2-operations.md`、`test_accounts.md`）。如需更新，請立即修改文件避免文件落後於程式碼。**
+- **只要變動環境參數、帳號密碼或部署流程（包含 `docker-compose.yml`、`.env*`、AWS 安全群組 / Elastic IP、資料庫備援、測試帳號等），都必須同步檢查 `docs/` 內對應文件（例如 `aws-ec2-operations.md`、`docker-sqlite-deployment-guide.md`、`test_accounts.md`、`NEXT_STEPS.md`）。必要時立即更新文件並在 PR/Commit 記錄，避免文件落後於實際系統狀態。**
 
 ## AWS CLI 與 EC2 連線指南
 - AWS CLI 事前需在本機設定 `~/.aws/credentials` 與 `~/.aws/config`，確保擁有 `ec2:*` 等必要權限。常用查詢指令示例：
