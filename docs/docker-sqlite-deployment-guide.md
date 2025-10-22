@@ -56,7 +56,7 @@
    ```
   - `DJANGO_SETTINGS_MODULE` 預設為 `hospital.settings.prod`（啟用強制 HTTPS 與安全設定）。範例檔同時預先加入 `DJANGO_SECURE_SSL_REDIRECT=0`、`DJANGO_SECURE_HSTS_SECONDS=0` 方便短期以 HTTP 測試；上線前請刪除或改回預設（`1` 與 `31536000`），或改用 `DJANGO_SETTINGS_MODULE=hospital.settings.prod` 搭配前置代理提供 HTTPS。
    - `DJANGO_SECRET_KEY` 請自行替換。
-   - `DJANGO_ALLOWED_HOSTS` 可加入自訂網域或 IP。
+   - 預設 `DJANGO_ALLOWED_HOSTS=*`，方便 demo；若要鎖定來源請改成逗號分隔的網域或 IP。
    - `DJANGO_DB_SQLITE_PATH` 亦可改為其他路徑。
 
 2. 建立資料夾並放入 SQLite 假資料（若已有本機 `db.sqlite3` 可直接複製）：

@@ -65,8 +65,8 @@ nano .env.docker
 在編輯器裡至少做這些事：
 
 - 把 `DJANGO_SECRET_KEY=replace-me` 改成任意長串密碼。
-- `DJANGO_ALLOWED_HOSTS` 加上 EC2 IP，例如 `DJANGO_ALLOWED_HOSTS=<EC2-IP>,localhost`.
-  - 如果已經有網域，也可以加上網域。
+- 預設 `DJANGO_ALLOWED_HOSTS=*`，若想限制來源就改成逗號分隔的 IP / 網域（例如 `DJANGO_ALLOWED_HOSTS=<EC2-IP>,localhost`）。
+- 如有自己的網域可一併加入。
 - 存檔離開（在 nano 裡是 `Ctrl+O`、`Enter`、`Ctrl+X`）。
 
 ---
