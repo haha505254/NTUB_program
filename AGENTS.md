@@ -35,3 +35,23 @@
 - Gunicorn 參數由 `GUNICORN_CMD_ARGS` 控制，正式環境請在 `.env.docker` 設定適當 worker 與 timeout。
 - 更新 `.env` 前務必檢查敏感資訊，避免進入版控。部署至 EC2 時，先以 `scp` 上傳 `db.sqlite3` 再用 `sudo mv` 替換，可保留正確權限。
 - EC2/Container 相關操作請參考 `docs/aws-ec2-operations.md` 與 `docs/docker-sqlite-deployment-guide.md`，確保 IP、Gunicorn worker、資料庫同步流程一致。
+
+## AWS CLI 與 EC2 連線指南
+- AWS CLI 事前需在本機設定 `~/.aws/credentials` 與 `~/.aws/config`，確保擁有 `ec2:*` 等必要權限。常用查詢指令示例：
+  ```bash
+  aws ec2 describe-instances --filters Name=instance-state-name,Values=running
+  aws ec2 stop-instances --instance-ids i-06dc8b0e59e1a523f
+  aws ec2 start-instances --instance-ids i-06dc8b0e59e1a523f
+  ```
+- 與 EC2 通訊一律使用私鑰 `~/.ssh/badminton-forum-osaka-key.pem`，並維持檔案權限 `chmod 600`。基本 SSH 指令：
+  ```bash
+  ssh -i ~/.ssh/badminton-forum-osaka-key.pem ubuntu@16.209.24.162
+  ```
+  若 IP 變動，請以最新綁定的 Elastic IP 或公有 DNS (`ec2-<ip>.ap-northeast-3.compute.amazonaws.com`) 取代。
+- 檔案同步範例：先把本機 SQLite 備份複製到 EC2，再以 `sudo mv` 覆蓋容器掛載路徑。
+  ```bash
+  scp -i ~/.ssh/badminton-forum-osaka-key.pem db.sqlite3 ubuntu@16.209.24.162:~/db.sqlite3.tmp
+  ssh -i ~/.ssh/badminton-forum-osaka-key.pem ubuntu@16.209.24.162 \
+      "sudo mv ~/db.sqlite3.tmp /home/ubuntu/hospital-app/.docker-data/sqlite/db.sqlite3"
+  ```
+  執行敏感操作前後請確認容器狀態（`docker ps`、`docker compose ps`），需要時重新啟動 `docker compose up -d`。
