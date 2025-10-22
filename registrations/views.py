@@ -51,6 +51,13 @@ class StaffDashboardView(StaffRequiredMixin, LoginRequiredMixin, TemplateView):
         search_form = PatientLookupForm(self.request.GET or None)
         context["search_form"] = search_form
         context["patient_create_form"] = StaffPatientCreationForm()
+        context["current_identifier"] = self.request.GET.get("identifier", "")
+        mode = self.request.GET.get("mode")
+        if self.request.GET.get("identifier"):
+            mode = "search"
+        if mode not in {"search", "create"}:
+            mode = "search"
+        context["active_mode"] = mode
         patient = None
         if search_form.is_valid():
             identifier = search_form.cleaned_data.get("identifier")
@@ -94,7 +101,8 @@ class StaffPatientCreateView(StaffRequiredMixin, LoginRequiredMixin, View):
             redirect_url = f"{reverse('registrations:staff-dashboard')}?identifier={patient.medical_record_number}"
             return redirect(redirect_url)
         self._report_form_errors(request, form)
-        return redirect(reverse("registrations:staff-dashboard"))
+        redirect_url = f"{reverse('registrations:staff-dashboard')}?mode=create"
+        return redirect(redirect_url)
 
     @staticmethod
     def _report_form_errors(request, form):
