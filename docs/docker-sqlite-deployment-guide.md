@@ -54,7 +54,7 @@
    ```bash
    cp .env.docker.example .env.docker
    ```
-   - `DJANGO_SETTINGS_MODULE` 預設為 `hospital.settings.prod`（啟用強制 HTTPS 與安全設定；若僅在純 HTTP 環境測試，可暫時改為 `hospital.settings.dev` 或在 `.env.docker` 增加 `DJANGO_SECURE_SSL_REDIRECT=0`）。
+  - `DJANGO_SETTINGS_MODULE` 預設為 `hospital.settings.prod`（啟用強制 HTTPS 與安全設定）。範例檔同時預先加入 `DJANGO_SECURE_SSL_REDIRECT=0` 方便短期以 HTTP 測試；上線前請刪除或改回 `1`，或改用 `DJANGO_SETTINGS_MODULE=hospital.settings.prod` 搭配前置代理提供 HTTPS。
    - `DJANGO_SECRET_KEY` 請自行替換。
    - `DJANGO_ALLOWED_HOSTS` 可加入自訂網域或 IP。
    - `DJANGO_DB_SQLITE_PATH` 亦可改為其他路徑。
@@ -120,7 +120,7 @@ tar czf backup-media.tgz media
 
 ## 6. 其他注意事項
 
-- 若在純 HTTP 或局域網測試，需要關閉強制 HTTPS，可暫時將 `DJANGO_SETTINGS_MODULE` 改為 `hospital.settings.dev`，或在 `.env.docker` 內加上 `DJANGO_SECURE_SSL_REDIRECT=0` 後重啟服務。
+- 若在純 HTTP 或局域網測試，可使用範例檔預設的 `DJANGO_SECURE_SSL_REDIRECT=0`。要改回正式環境時，請刪除此行（或設為 `1`）並重新啟動服務，確保流量強制走 HTTPS。
 - 若要載入 fixtures，可於啟動後執行：
   ```bash
   docker compose exec web python manage.py loaddata fixtures/seed.json

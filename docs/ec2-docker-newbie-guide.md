@@ -125,7 +125,7 @@ docker compose up -d
 ## 9. 下一步（想更進階可以再做）
 
 - 設定 Nginx 或 ALB，讓對外網址改成 80/443，避免直接暴露 8000。
-- `.env.docker` 預設使用 `hospital.settings.prod`；若在純 HTTP 測試需關閉 HTTPS 轉向，可暫時改用 `hospital.settings.dev` 或設定 `DJANGO_SECURE_SSL_REDIRECT=0`。
+- `.env.docker` 預設使用 `hospital.settings.prod`，並在範例檔中預先寫入 `DJANGO_SECURE_SSL_REDIRECT=0` 方便測試；要上線前請刪除或改回 `1`，或改用前置代理提供 HTTPS。
 - 使用 `tar` 備份 `.docker-data/sqlite` 與 `media`。
 - 搭配 `systemd` 或 CI/CD 自動部署。
 
