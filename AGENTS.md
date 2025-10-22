@@ -56,3 +56,10 @@
       "sudo mv ~/db.sqlite3.tmp /home/ubuntu/hospital-app/.docker-data/sqlite/db.sqlite3"
   ```
   執行敏感操作前後請確認容器狀態（`docker ps`、`docker compose ps`），需要時重新啟動 `docker compose up -d`。
+
+## HTTP 部署調整紀錄（2025-10）
+- **ALLOWED_HOSTS 放寬**：`.env.docker` 設為 `DJANGO_ALLOWED_HOSTS=*`，`hospital/settings/prod.py` 會讀取此值，解決 `DisallowedHost` 錯誤並允許 Elastic IP、DNS、內網位址皆能直接存取。
+- **停用強制 HTTPS 與相關安全標頭**：同一份 `.env.docker` 將 `DJANGO_SECURE_SSL_REDIRECT`、`DJANGO_SECURE_HSTS_SECONDS`、`DJANGO_SESSION_COOKIE_SECURE`、`DJANGO_CSRF_COOKIE_SECURE`、`DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS`、`DJANGO_SECURE_HSTS_PRELOAD`、`DJANGO_SECURE_PROXY_SSL_HEADER` 設為 `0`，避免 HTTP 連線被自動轉址或遭瀏覽器忽略。
+- **Gunicorn worker 調整**：`Dockerfile` 加入 `ENV GUNICORN_CMD_ARGS="--workers 5 --timeout 60"`，在 2 vCPU 的 EC2 上提供 5 個 worker 與 60 秒 timeout，降低單一請求卡住造成整站停擺的風險。
+- **資料同步流程**：部署前以 `scp` 將本地最新 `db.sqlite3` 上傳，並用 `sudo mv` 覆蓋 `/home/ubuntu/hospital-app/.docker-data/sqlite/db.sqlite3`，確保 HTTP 服務與資料一致。
+- **Elastic IP 更新**：重新綁定新的 EIP `16.209.24.162`，並釋放舊 IP；在 `.env.docker` 放寬 ALLOWED_HOSTS 後即可使用新 IP 或對應 DNS 透過 HTTP 正常存取。
